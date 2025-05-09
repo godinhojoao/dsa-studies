@@ -6,7 +6,7 @@
 ## Table of Contents
 
 - [What is Big O?](#what-is-big-o)
-- [What does Asymptotic and Asymptotic Notation means?](#what-does-asymptotic-and-asymptotic-notation-means)
+- [What does Asymptotic and Asymptotic Notation mean?](#what-does-asymptotic-and-asymptotic-notation-means)
 - [Time Complexity](#time-complexity)
   - [1. Constant Time - O(1)](#1-constant-time---o1)
   - [2. Linear Time - O(n)](#2-linear-time---on)
@@ -27,13 +27,13 @@
 - [Cons of Big O](#cons-of-big-o)
 - [References](#references)
 
-## What does `Asymptotic` and `Asymptotic Notation` means?
+## What does `Asymptotic` and `Asymptotic Notation` mean?
 
 - **Problems with measuring time and space by just running the algorithm**:
   - Results vary across different computers.
-  - Even on the same computer, background processes and daemons can affect performance.
+  - Background processes and daemons can affect performance even on the same computer.
   - Without the computing power of companies like Google, we rely on asymptotic notation to understand algorithm efficiency with large inputs.
-  - `That’s why we use Asymptotic notation`; to evaluate time and space complexity in a consistent, machine-independent way.
+  - `That’s why we use Asymptotic notation`; to evaluate time and space complexity consistently, machine-independently.
 - `Asymptotic`:
   - While having a background in calculus is helpful, it's not strictly necessary to understand asymptotic analysis.
   - Asymptotic analysis studies **how a function behaves as its input approaches infinity**. For example, consider a function `f(x)`; as x increases more and more, how does the function behave? [Watch this](https://www.youtube.com/watch?v=myZKhztFhzE&ab_channel=BackToBackSWE)
@@ -42,12 +42,12 @@
     - `Big O` for the upper limit (worst-case).
     - `Big Omega` for the lower limit (best-case).
     - `Big Theta` for the tight bound (typically used for average-case or general characterization).
-- We normally refer to **Algorithms Complexity** with expressions like: `factorial time`, `quadratic time`, `linear time`, and so on.
+- We normally refer to **Algorithmic Complexity** with expressions like: `factorial time`, `quadratic time`, `linear time`, and so on.
   - This means we are **not describing a specific graph**, but rather **classifying the growth behavior** of the algorithm's runtime.
 
 ## What is Big O?
 
-- Big O is a notation used to describe the time complexity and space complexity of an algorithm in terms of the input size.
+- Big O is a notation used to describe an algorithm's time complexity and space complexity in terms of the input size.
   - How the execution time (or memory usage) of an algorithm increases as the size of the input grows.
 
 ## Time Complexity
@@ -102,7 +102,7 @@ function quadraticTime(arr) {
 - **How to measure it?**
   - Count the amount of memory required for variables, data structures, and recursive calls as the input size grows.
 - A common mistake when analyzing algorithms is confusing `Auxiliary Space` with `Space Complexity`; but they’re not the same:
-  - `Auxiliary Space`: Extra memory used by the algorithm excluding the input/output.
+  - `Auxiliary Space`: Extra memory used by the algorithm, excluding the input/output.
   - `Space Complexity`: Total memory used, including input, output, and auxiliary space.
 - Below we will have some examples of `Auxiliary Space`.
 
@@ -153,7 +153,7 @@ function quadraticSpace(n) {
 ```
 ## Determining Complexity of Recursive Algorithm
 
-- At this section we will see how to determine **space and time complexity** for **recursive algorithms**, but we will not dive deeply on Recurrence Relations and Master Theorem.
+- In this section, we will see how to determine **space and time complexity** for **recursive algorithms**, but we will not dive deeply into Recurrence Relations and the Master Theorem.
 - We’ll use the classic example: recursive Fibonacci.
 
 ```js
@@ -168,16 +168,16 @@ function recursiveFib(n) {
 - This exponential growth leads to ~2^n calls.
   - It's not exactly 2^n, but we drop constants and consider O(2^n).
 - See the tree below to understand how the calls branch:
-  ![Recursive Fibonacci Tree](recursive-complexity/tree-recursive-fib.png)
+  ![Recursive Fibonacci Tree](https://i.ibb.co/kgjmzKxR/tree-recursive-fib.png)
 
 - **Space Complexity: O(n)**
 
   - This comes from how the **call stack** works during recursion.
   - When a function calls itself, it’s paused and added to a stack until the recursive call finishes.
-  - In the worst case (e.g. leftmost path of the call tree), the stack can grow to depth `n` before the functions finish and return.
+  - In the worst case (e.g., leftmost path of the call tree), the stack can grow to depth `n` before the functions finish and return.
   - So, the maximum number of active function calls at once is proportional to `n`.
 
-- For better understanding look:
+- For better understanding, look:
   - [Fib C example](./recursive-complexity/fib.c)
   - [Fib JS example](./recursive-complexity/fib.js)
 
@@ -189,7 +189,7 @@ function recursiveFib(n) {
 
 ### 1. Worst Case
 
-- If we got Jack as the first user we would have O(1), but this case doesn't matter for Big O notation.
+- If we got Jack as the first user, we would have O(1), but this case doesn't matter for Big O notation.
 - Big O cares only about the **worst case**, and this is **O(n)**.
 
   ```js
@@ -206,10 +206,10 @@ function recursiveFib(n) {
 
 ### 2. Drop Constants
 
-- What matters is the asymptotic beahvior which means that we analyze the growth of an algorithm as the input size `n` approaches infinity. And because of that constants become negligible compared to how the function grows.
+- What matters is the asymptotic behavior, which means that we analyze the growth of an algorithm as the input size `n` approaches infinity. And because of that, constants become negligible compared to how the function grows.
   - O(2n), O(100n) and O(10000n) all grow linearly as `n` grows.
   - The constant factors don't affect the shape of the growth curve, just the initial height.
-- It's also good because it simplify comparisons, for example, it's easy to see that `O(n log n)` is better than `O(n^2)`.
+- It's also good because it simplifies comparisons, for example, it's easy to see that `O(n log n)` is better than `O(n^2)`.
 
   ```js
   // - This is not O(2n), because Big O measures growth patterns, not exact performance.
