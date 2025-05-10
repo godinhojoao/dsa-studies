@@ -6,7 +6,7 @@
 ## Table of Contents
 
 - [What is Big O?](#what-is-big-o)
-- [What does Asymptotic and Asymptotic Notation mean?](#what-does-asymptotic-and-asymptotic-notation-means)
+- [What does Asymptotic and Asymptotic Notation mean?](#what-does-asymptotic-and-asymptotic-notation-mean)
 - [Time Complexity](#time-complexity)
   - [1. Constant Time - O(1)](#1-constant-time---o1)
   - [2. Linear Time - O(n)](#2-linear-time---on)
@@ -15,7 +15,7 @@
   - [1. Constant Space - O(1)](#1-constant-space---o1)
   - [2. Linear Space - O(n)](#2-linear-space---on)
   - [3. Quadratic Space - O(n^2)](#3-quadratic-space---on2)
-- [Determining Complexity of Recursive Algorithm](#determining-complexity-of-recursive-algorithm)
+- [Determining the Complexity of a Recursive Algorithm](#determining-the-complexity-of-a-recursive-algorithm)
 - [Big-O Complexity Chart](#big-o-complexity-chart)
 - [Four rules of Big O](#four-rules-of-big-o)
   - [1. Worst Case](#1-worst-case)
@@ -27,13 +27,13 @@
 - [Cons of Big O](#cons-of-big-o)
 - [References](#references)
 
-## What does `Asymptotic` and `Asymptotic Notation` mean?
+## What does Asymptotic and Asymptotic Notation mean?
 
 - **Problems with measuring time and space by just running the algorithm**:
   - Results vary across different computers.
   - Background processes and daemons can affect performance even on the same computer.
   - Without the computing power of companies like Google, we rely on asymptotic notation to understand algorithm efficiency with large inputs.
-  - `That’s why we use Asymptotic notation`; to evaluate time and space complexity consistently, machine-independently.
+  - `That’s why we use Asymptotic notation`; to consistently evaluate time and space complexity, machine-independently.
 - `Asymptotic`:
   - While having a background in calculus is helpful, it's not strictly necessary to understand asymptotic analysis.
   - Asymptotic analysis studies **how a function behaves as its input approaches infinity**. For example, consider a function `f(x)`; as x increases more and more, how does the function behave? [Watch this](https://www.youtube.com/watch?v=myZKhztFhzE&ab_channel=BackToBackSWE)
@@ -60,7 +60,7 @@
 
 ### 1. Constant Time - `O(1)`
 
-- No matter the size of the input, the algorithm performs a fixed number of operations.
+- No matter the input size, the algorithm performs a fixed number of operations.
 
 ```js
 function getFirstElement(arr) {
@@ -151,7 +151,7 @@ function quadraticSpace(n) {
   return matrix;
 }
 ```
-## Determining Complexity of Recursive Algorithm
+## Determining the Complexity of a Recursive Algorithm
 
 - In this section, we will see how to determine **space and time complexity** for **recursive algorithms**, but we will not dive deeply into Recurrence Relations and the Master Theorem.
 - We’ll use the classic example: recursive Fibonacci.
