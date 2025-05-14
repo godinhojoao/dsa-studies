@@ -49,6 +49,7 @@
 
 - Big O is a notation used to describe an algorithm's time complexity and space complexity in terms of the input size.
   - How the execution time (or memory usage) of an algorithm increases as the size of the input grows.
+  - Big O isn't primarily about performance; it's about scalability;
 
 ## Time Complexity
 

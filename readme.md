@@ -8,6 +8,13 @@
 - Algorithm Complexity Analysis
   - [Algorithm Complexity Analysis PART I - Big O](./algorithm-complexity-analysis/part1-bigO.md)
     - [Recursive Complexity](./algorithm-complexity-analysis/recursive-complexity)
+- Data Structures and Algorithms in C
+  - [Dynamic Array MD](./data-structures-in-c/dynamicArray.md)
+    - [Dynamic Array C](./data-structures-in-c/dynamicArray.c)
+- C programming concepts
+  - [2D Arrays and Pointers](./c-programming-concepts/2D-array-and-pointers.c)
+  - [Pointer Arithmetics](./c-programming-concepts/pointer-arithmetics.c)
+  - [Pointers to Functions](./c-programming-concepts/pointers-to-functions.c)
 
 ## Coming soon
 
