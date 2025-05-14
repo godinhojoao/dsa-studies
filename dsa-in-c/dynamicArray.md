@@ -10,7 +10,8 @@
 
 ## What is a Dynamic Array?
 
-- An array that grows
+- An array that can grow or shrink in size during runtime.
+- Unlike static arrays, which have a fixed size, dynamic arrays automatically resize as elements are added or removed.
 
 ## Sizing an Array appropriately
 
