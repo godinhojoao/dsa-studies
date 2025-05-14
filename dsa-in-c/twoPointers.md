@@ -37,6 +37,14 @@ void reverseString(char* s, int sSize) {
 }
 ```
 
+## Visualizing:
+
+![1st Start the Two Pointers](./../assets/1st-two-pointers.png)
+
+![2nd Swap the Characters](./../assets/2nd-two-pointers.png)
+
+![3rd Move Pointers](./../assets/3rd-two-pointers.png)
+
 ## What else could we solve with this?
 
 - **Valid palindrome**: https://leetcode.com/problems/valid-palindrome/description/
