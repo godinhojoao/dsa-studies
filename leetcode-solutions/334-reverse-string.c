@@ -1,5 +1,5 @@
-// https://leetcode.com/problems/reverse-string/
-// we dit it using two pointers, read more on ./dsa-in-c/twoPointers.md
+// https://leetcode.com/problems/reverse-string/description/
+// I did it using two pointers, read more on ./dsa-in-c/twoPointers.md
 
 void reverseString(char* s, int sSize) {
   int left = 0;
