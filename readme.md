@@ -16,6 +16,8 @@
   - [Dynamic Array C](./dsa-in-c/dynamicArray.c)
 - [Two Pointers MD](./dsa-in-c/twoPointers.md)
   - [Two Pointers C](./dsa-in-c/twoPointers.c)
+- [Binary Search MD](./dsa-in-c/binarySearch.md)
+  - [Binary Search C](./dsa-in-c/binarySearch.c)
 
 ### C programming concepts
 
@@ -26,3 +28,5 @@
 ### LeetCode Solutions
 
 - [334-reverse-string.c](./leetcode-solutions/334-reverse-string.c)
+- [167-two-sum-sorted-array.c](./leetcode-solutions/167-two-sum-sorted-array.c)
+- [704-binary-search](./leetcode-solutions/704-binary-search.c)
