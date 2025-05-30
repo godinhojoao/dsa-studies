@@ -10,14 +10,21 @@
 - [Algorithm Complexity Analysis PART I - Big O](./algorithm-complexity-analysis/part1-bigO.md)
   - [Recursive Complexity](./algorithm-complexity-analysis/recursive-complexity)
 
-### Data Structures and Algorithms in C
+### Data Structures
 
 - [Dynamic Array MD](./dsa-in-c/dynamicArray.md)
   - [Dynamic Array C](./dsa-in-c/dynamicArray.c)
+- [Stack MD](./dsa-in-c/stack.md)
+  - [Stack C](./dsa-in-c/stack.c)
+
+### Algorithms
+
 - [Two Pointers MD](./dsa-in-c/twoPointers.md)
   - [Two Pointers C](./dsa-in-c/twoPointers.c)
 - [Binary Search MD](./dsa-in-c/binarySearch.md)
   - [Binary Search C](./dsa-in-c/binarySearch.c)
+  <!-- - [Sliding Window MD](./dsa-in-c/sliding-window.md)
+  - [Sliding Window C](./dsa-in-c/sliding-window.c) -->
 
 ### C programming concepts
 

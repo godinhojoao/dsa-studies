@@ -206,6 +206,14 @@ void printDynamicArray(DynamicArray* array, char arrayName[]) {
 }
 ```
 
+## Valgrind:
+
+![Valgrind result](./../assets/valgrind-dynamic-array-c.png)
+
+## Thoughts
+
+- You can use dynamic allocation by doubling the capacity when it reaches the limit. This helps save resources and improve performance.
+
 ## References
 
 - https://www.geeksforgeeks.org/dynamic-array-in-c/
