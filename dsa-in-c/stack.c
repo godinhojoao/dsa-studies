@@ -63,6 +63,14 @@ User* pop(Stack* stack) {
   return &stack->users[stack->top];
 }
 
+User* peek(Stack* stack) {
+  if(isEmpty(stack)) {
+    printf("stack is empty, can't peek\n");
+    return NULL;
+  }
+  return &stack->users[stack->top - 1];
+}
+
 void clear(Stack* stack) {
   free(stack->users);
   reset(stack, 0);
@@ -81,6 +89,7 @@ int main() {
   reset(usersStack, 2);  // start with limit size of 2
 
   pop(usersStack);  // stack is empty, can't pop
+  peek(usersStack); // stack is empty, can't peek
 
   // add 3 users
   push(usersStack, joaoUser);
@@ -89,6 +98,10 @@ int main() {
   free(joaoUser);
   free(doeUser);
   free(johnUser);
+
+  // Use peek to check the top without removing it from the stack
+  User* peekUser = peek(usersStack);
+  printf("1 peekUser->name: %s\n", peekUser->name);  // john
 
   // LIFO - last in first out
   User* topUser1 = pop(usersStack);
@@ -99,6 +112,7 @@ int main() {
   printf("3 topUser3->name: %s\n", topUser3->name);  // joao
 
   pop(usersStack);  // stack is empty, can't pop
+  peek(usersStack);  // stack is empty, can't peek
 
   clear(usersStack);
 

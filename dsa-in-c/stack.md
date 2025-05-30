@@ -15,10 +15,11 @@
 
 - `reset`: Reset the stack setting `base=0`, `top=0`, `limit` and `items`;
 - `push`: Insert a new item to the top of the stack.
-  - `isFull`: Used on push to check if stack is full.
-- `pop`: Return the last inserted item and removes it from the stack.
-  - `isEmpty`: Used on pop to check if stack is empty.
+- `pop`: Return the last inserted item and **removes it** from the stack.
+- `peek`: Return the last inserted item **without removing** it from the stack.
 - `clear`: Clear and free all memory for the stack.
+- `isFull`: Used on push to check if stack is full.
+- `isEmpty`: Used on pop and peek to check if stack is empty.
 
 ## Visualizing Stack
 
