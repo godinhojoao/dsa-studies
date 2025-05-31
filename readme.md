@@ -16,6 +16,8 @@
   - [Dynamic Array C](./dsa-in-c/dynamicArray.c)
 - [Stack MD](./dsa-in-c/stack.md)
   - [Stack C](./dsa-in-c/stack.c)
+- [Queue MD](./dsa-in-c/queue.md)
+  - [Queue C](./dsa-in-c/queue.c)
 
 ### Algorithms
 

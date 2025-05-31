@@ -1,6 +1,6 @@
 # Stack
 
-- A stack is a `data structure`, and as a such, it follows specific rules.
+- A stack is a `data structure`, and as such, it follows specific rules.
 - Stack works following: `LIFO - Last in First Out`
   - Which means that when you push two items `1st: A`, `2nd: B`; if you make a `pop` it will first return the last inserted `B`.
 
