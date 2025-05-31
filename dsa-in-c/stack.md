@@ -19,13 +19,15 @@
 - `peek`: Return the last inserted item **without removing** it from the stack.
 - `clear`: Clear and free all memory for the stack.
 - `isFull`: Used on push to check if stack is full.
+  - If we try to push on a full stack we got a `stack overflow`
 - `isEmpty`: Used on pop and peek to check if stack is empty.
+  - If we try to pop on a empty stack we got a `stack underflow`
 
 ## Visualizing Stack
 
 ![Stack visualization](./../assets/1st-stack-visualization.png)
 
-## How to implement Sliding Window:
+## How to implement Stack:
 
 - 1. Understand the theory and rules behind a stack
 - 2. Understand the properties and methods it generally implements
