@@ -1,7 +1,9 @@
 /*
 Deleting the executable after running:
 gcc agenda-buffer.c -o test && ./test < input.txt && rm -rf ./test
+gcc agenda-buffer.c -o test && ./test && rm -rf ./test
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
