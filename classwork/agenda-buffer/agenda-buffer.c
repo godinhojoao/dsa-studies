@@ -8,14 +8,25 @@ gcc agenda-buffer.c -o test && ./test && rm -rf ./test
 #include <stdlib.h>
 #include <string.h>
 
-#define START_BUFFER_SIZE_IN_BYTES sizeof(int) * 2 + sizeof(char) * 30  // operation, usersAmount, searchName
-#define USER_INFOS_SIZE_IN_BYTES (sizeof(int) + sizeof(char) * 30 * 2)  // age, name, email
+#define STRING_MAX_SIZE 300
+// operation, currentUsersSize, searchName, tempName, tempEmail
+#define START_BUFFER_SIZE_IN_BYTES sizeof(int) + sizeof(size_t) + sizeof(char) * STRING_MAX_SIZE * 3
 
 void addUser(void** bufferPtr) {
   void* myBuffer = *bufferPtr;
-  int* currUsersAmount = (int*)myBuffer + 1;  // skip age and get usersAmount
+  char* tempName = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES - STRING_MAX_SIZE * 2;
+  char* tempEmail = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES - STRING_MAX_SIZE;
 
-  myBuffer = realloc(myBuffer, START_BUFFER_SIZE_IN_BYTES + USER_INFOS_SIZE_IN_BYTES * (*currUsersAmount + 1));
+  printf("User name: ");
+  scanf("%s", tempName);
+  printf("User email: ");
+  scanf("%s", tempEmail);
+
+  // +1 on length to include \0 for string end
+  size_t newUserSize = sizeof(int) + strlen(tempName) + 1 + strlen(tempEmail) + 1;
+  size_t* currentUsersSize = (size_t*)((int*)myBuffer + 1);
+
+  myBuffer = realloc(myBuffer, START_BUFFER_SIZE_IN_BYTES + *currentUsersSize + newUserSize);
   if(!myBuffer) {
     printf("error on realloc - add");
     printf("realloc failed");
@@ -24,45 +35,49 @@ void addUser(void** bufferPtr) {
   *bufferPtr = myBuffer;  // update original ptr with new buffer
 
   // after realloc, old pointer is freed and this new one (bigger) is created
-  int* usersAmount = (int*)myBuffer + 1;
-  int* agePtr = (int*)((char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + USER_INFOS_SIZE_IN_BYTES * *currUsersAmount);
-  char* namePtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + USER_INFOS_SIZE_IN_BYTES * *currUsersAmount + sizeof(int);
-  char* emailPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + USER_INFOS_SIZE_IN_BYTES * *currUsersAmount + sizeof(int) + 30 * sizeof(char);
+  int* agePtr = (int*)((char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + *currentUsersSize);
+  char* namePtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + *currentUsersSize + sizeof(int);
+  char* emailPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + *currentUsersSize + sizeof(int) + (strlen(tempName) + 1);
 
-  printf("User name: ");
-  scanf("%s", namePtr);
-  printf("User email: ");
-  scanf("%s", emailPtr);
+  // saving data in the right places within the buffer
+  strcpy(namePtr, tempName);
+  strcpy(emailPtr, tempEmail);
   printf("User age: ");
   scanf("%d", agePtr);
+  *currentUsersSize += newUserSize;
 
-  (*usersAmount) = *currUsersAmount + 1;
+  strcpy(tempName, "");
+  strcpy(tempEmail, "");
 }
 
 void listUsers(void** bufferPtr) {
   void* myBuffer = *bufferPtr;
-  int* usersAmount = (int*)myBuffer + 1;
-  if(*usersAmount < 1) {
+  size_t* currentUsersSize = (size_t*)((int*)myBuffer + 1);
+
+  if(*currentUsersSize == 0) {
     printf("Empty users list.");
     return;
   }
 
   char* currentUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES;
-  char* lastUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + (*usersAmount * USER_INFOS_SIZE_IN_BYTES);
+  char* endOfUsersPtr = currentUserPtr + *currentUsersSize;
 
-  while(currentUserPtr < lastUserPtr) {
+  while(currentUserPtr < endOfUsersPtr) {
     int* age = (int*)currentUserPtr;
     char* name = (char*)currentUserPtr + sizeof(int);
-    char* email = (char*)currentUserPtr + sizeof(int) + sizeof(char) * 30;
+    char* email = (char*)currentUserPtr + sizeof(int) + strlen(name) + 1;
+
     printf("\nname: %s - email: %s - age: %d", name, email, *age);
-    currentUserPtr += USER_INFOS_SIZE_IN_BYTES;
+
+    currentUserPtr += sizeof(int) + strlen(name) + 1 + strlen(email) + 1;
   }
 }
 
 void searchByName(void** bufferPtr) {
   void* myBuffer = *bufferPtr;
-  int* usersAmount = (int*)myBuffer + 1;
-  if(*usersAmount < 1) {
+  size_t* currentUsersSize = (size_t*)((int*)myBuffer + 1);
+
+  if(*currentUsersSize == 0) {
     printf("Empty users list.");
     return;
   }
@@ -72,63 +87,71 @@ void searchByName(void** bufferPtr) {
   scanf("%s", searchName);
 
   char* currentUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES;
-  char* lastUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + (*usersAmount * USER_INFOS_SIZE_IN_BYTES);
+  char* endOfUsersPtr = currentUserPtr + *currentUsersSize;
 
-  while(currentUserPtr < lastUserPtr) {
+  while(currentUserPtr < endOfUsersPtr) {
+    int* age = (int*)currentUserPtr;
     char* name = (char*)currentUserPtr + sizeof(int);
+    char* email = (char*)currentUserPtr + sizeof(int) + strlen(name) + 1;
+
     if(strcmp(name, searchName) == 0) {
-      int* age = (int*)currentUserPtr;
-      char* email = (char*)currentUserPtr + sizeof(int) + sizeof(char) * 30;
       printf("\nFound-> name: %s - email: %s - age: %d", name, email, *age);
       strcpy(searchName, "");
       return;
     }
-    currentUserPtr += USER_INFOS_SIZE_IN_BYTES;
+
+    currentUserPtr += sizeof(int) + strlen(name) + 1 + strlen(email) + 1;
   }
-  printf("User: %s not found!\n", searchName);
+  printf("User: %s not found!", searchName);
+
   strcpy(searchName, "");
 }
 
 void removeUserByName(void** bufferPtr) {
   void* myBuffer = *bufferPtr;
-  int* usersAmount = (int*)myBuffer + 1;
-  if(*usersAmount < 1) {
+  size_t* currentUsersSize = (size_t*)((int*)myBuffer + 1);
+
+  if(*currentUsersSize == 0) {
     printf("Empty users list.");
     return;
   }
 
   char* searchName = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES - 30;
-  printf("User name to remove: ");
+  printf("User name to search: ");
   scanf("%s", searchName);
 
   char* currentUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES;
-  char* lastUserPtr = (char*)myBuffer + START_BUFFER_SIZE_IN_BYTES + (*usersAmount * USER_INFOS_SIZE_IN_BYTES);
+  char* endOfUsersPtr = currentUserPtr + *currentUsersSize;
 
-  while(currentUserPtr < lastUserPtr) {
+  while(currentUserPtr < endOfUsersPtr) {
+    int* age = (int*)currentUserPtr;
     char* name = (char*)currentUserPtr + sizeof(int);
+    char* email = (char*)currentUserPtr + sizeof(int) + strlen(name) + 1;
+
     if(strcmp(name, searchName) == 0) {
       printf("\nDeleted user: %s", name);
       strcpy(searchName, "");
 
       // all in front of this user, go one position behind (one step back)
-      char* frontUser = (char*)currentUserPtr + USER_INFOS_SIZE_IN_BYTES;
-      while(frontUser < lastUserPtr) {
+      char* frontUser = (char*)currentUserPtr + sizeof(int) + strlen(name) + 1 + strlen(email) + 1;
+      while(frontUser < endOfUsersPtr) {
         int* frontUserAge = (int*)frontUser;
         char* frontUserName = (char*)frontUser + sizeof(int);
-        char* frontUserEmail = (char*)frontUser + sizeof(int) + sizeof(char) * 30;
+        char* frontUserEmail = (char*)frontUser + sizeof(int) + strlen(name) + 1;
 
-        int* newAgePosition = (int*)((char*)frontUserAge - ((sizeof(char) * 30 * 2) + sizeof(int)));  // return email, name and age
-        char* newNamePosition = (char*)frontUserAge - sizeof(char) * 30 * 2;  // return email, name
-        char* newEmailPosition = (char*)frontUserAge - sizeof(char) * 30;  // return email
+        int* newAgePosition = (int*)((char*)frontUserAge - (strlen(name) + 1 + strlen(email) + 1 + sizeof(int)));  // return email, name and age
+        char* newNamePosition = (char*)frontUserAge - strlen(name) + 1 + strlen(email) + 1;  // return email, name
+        char* newEmailPosition = (char*)frontUserAge - strlen(email) + 1;  // return email
+
         *newAgePosition = *frontUserAge;
         strcpy(newNamePosition, frontUserName);
         strcpy(newEmailPosition, frontUserEmail);
 
-        frontUser += USER_INFOS_SIZE_IN_BYTES;
+        frontUser += sizeof(int) + strlen(frontUserName) + 1 + strlen(frontUserEmail) + 1;
       }
 
-      *usersAmount -= 1;
-      myBuffer = realloc(myBuffer, START_BUFFER_SIZE_IN_BYTES + (USER_INFOS_SIZE_IN_BYTES * *usersAmount));
+      *currentUsersSize -= strlen(name) + 1 + strlen(email) + 1 + sizeof(int);
+      myBuffer = realloc(myBuffer, START_BUFFER_SIZE_IN_BYTES + *currentUsersSize);
       if(!myBuffer) {
         printf("error on realloc - remove");
         exit(1);
@@ -136,10 +159,11 @@ void removeUserByName(void** bufferPtr) {
       *bufferPtr = myBuffer;  // update original ptr with new buffer
       return;
     }
-    currentUserPtr += USER_INFOS_SIZE_IN_BYTES;
+
+    currentUserPtr += sizeof(int) + strlen(name) + 1 + strlen(email) + 1;
   }
 
-  printf("User: %s not found!\n", searchName);
+  printf("\nUser: %s not found!", searchName);
   strcpy(searchName, "");
 }
 
@@ -193,7 +217,7 @@ void menu(void** bufferPtr) {
 int main() {
   void* buffer = malloc(START_BUFFER_SIZE_IN_BYTES);
   *((int*)buffer) = 0;  // starting operation as 0
-  *((int*)buffer + 1) = 0;  // starting users amount as 0
+  *((size_t*)((int*)buffer + 1)) = 0;  // starting currentUsersSize as 0
 
   menu(&buffer);
 

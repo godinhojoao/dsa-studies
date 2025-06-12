@@ -1,4 +1,4 @@
-# João Godinho M2
+# João Godinho Jardim M2
 
 ## Create an agenda with the following menu:
 
@@ -22,4 +22,4 @@
 # Run with valgrind: (Dr memory and valgrind are incompatible with macos)
 
 1 - install docker on oficial website
-2 - Run on terminal: `docker build -t valgrind-runner . && docker run valgrind-runner`
+2 - Run on terminal: `docker build -t valgrind-runner . && docker run valgrind-runner && docker run --rm valgrind-runner`
