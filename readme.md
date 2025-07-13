@@ -43,7 +43,7 @@
 - [110-balanced-binary-tree.c](./leetcode-solutions/110-balanced-binary-tree.c)
 - [155-min-stack.c](./leetcode-solutions/155-min-stack.c)
 - [167-two-sum-sorted-array.c](./leetcode-solutions/167-two-sum-sorted-array.c)
-<!-- - [20-valid-parentheses.c](./leetcode-solutions/20-valid-parentheses.c) -->
+- [20-valid-parentheses.c](./leetcode-solutions/20-valid-parentheses.c)
 - [225-stack-using-queues.c](./leetcode-solutions/225-stack-using-queues.c)
 - [232-queue-using-stacks.c](./leetcode-solutions/232-queue-using-stacks.c)
 - [232-queue-using-stacks.md](./leetcode-solutions/232-queue-using-stacks.md)
