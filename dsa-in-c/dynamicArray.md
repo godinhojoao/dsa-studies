@@ -4,7 +4,7 @@
 
 ## Prerequisites:
 
-- Basic knowledge of programming (logic, etc..);
+- Basic knowledge of programming (logic, etc);
 - C syntax, allocating variables;
 - Memory management in C: pointers, malloc, calloc, realloc, free;
 
@@ -34,7 +34,7 @@
 ## How to Develop a Dynamic Array in C
 
 - In this code, we define an int pointer using `malloc`. While `calloc` could be used to initialize the array with zeros for memory safety, it's not necessary for this example. We'll discuss memory safety in another article.
-- To benefit from dynamic memory allocation we will start the array with a small capacity of 2 integers, and will grow when needed using `realloc`, we will doubly the capacity every time we reach the limit.
+- To benefit from dynamic memory allocation, we will start the array with a small capacity of 2 integers, and will grow when needed using `realloc`, we will double the capacity every time we reach the limit.
 
 ```c
 #include <stdio.h>
@@ -50,7 +50,7 @@ int main() {
   return 0;
 }
 
-// EXAMPLE: Doubling the capacity everytime we reach the limit
+// EXAMPLE: Doubling the capacity every time we reach the limit
 void dynamicArrayExample(int startCapacity) {
   int* numbers = (int*)malloc(sizeof(int) * startCapacity);
   if(numbers == NULL) {
@@ -65,7 +65,7 @@ void dynamicArrayExample(int startCapacity) {
 
   printArrayItems(numbers, currentArrayLength, "numbers");  // numbers: 10, 11.
 
-  // numbers[0] = 10; -> this could lead to an unexpected behavior writing on memory that is not "hold" by the pointer
+  // numbers[0] = 10; -> this could lead to an unexpected behavior writing on memory that is not "held" by the pointer
 
   // adding the 3rd item | capacity goes from 2 to 4
   pushToDynamicArray(&numbers, 12, &currentArrayLength, &currentArrayCapacity);
