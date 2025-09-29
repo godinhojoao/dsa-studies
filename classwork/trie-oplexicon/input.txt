@@ -1,0 +1,10 @@
+2
+legal
+1
+2
+legalizado
+1
+3
+legalizado
+0
+4
