@@ -1,0 +1,10 @@
+2
+banana
+3
+banana
+1
+banana
+adj,1
+2
+banana
+4
