@@ -1,9 +1,12 @@
 
 /*
------> missing features
-[ ] - insert in any direction randomly
-[ ] - show random cells
-[ ] - get words randomly, not it in order
+-> improvements
+[ ] - use a hashtable for WordAuxForSearch and then change all places including: searchWordAndUpdateTable
+support for directions:
+[ ] - horizontal right left
+[ ] - vertical bottom top
+[ ] - diagonal all directions (top bottom, bottom top, left and right in each) -> 4 directions
+[ ] - fix to avoid O(n^2) insertWordByPosition
 */
 
 // gcc crosswords.c -o test && ./test && rm -rf ./test
@@ -12,18 +15,28 @@
 #include <string.h>
 #include <time.h>
 
+#define POSSIBLE_DIRECTIONS_AMOUNT 2
+#define HORIZONTAL_LEFT_RIGHT_DIRECTION 0
+#define VERTICAL_TOP_BOTTOM_DIRECTION 1
+#define RANDOM_CHAR_EMPTY_DIRECTION -1
+int DIRECTIONS_DIFFERENCES_ARR[POSSIBLE_DIRECTIONS_AMOUNT][2] = {
+    // (row, col)
+    {0, 1},  // HORIZONTAL_LEFT_RIGHT_DIRECTION
+    {1, 0},  // VERTICAL_TOP_BOTTOM_DIRECTION
+};
+
 typedef struct Cell {
   char val;
   int isVisible;
-  int direction;  // 0=horizontal, 1 = vertical, 2 = diagonal, -1 = random doesn't matter
+  int direction;  // 0 = horizontal, 1 = vertical, -1 = random char doesn't matter
   int isStartOfWord;
   int isEndOfWord;
-  int wordIndex;
 } Cell;
 
 typedef struct WordAuxForSearch {
   int startCol;
   int startRow;
+  int direction;
   char* word;
 } WordAuxForSearch;
 
@@ -43,6 +56,7 @@ void freeGameState(Game* gameState) {
   for(int i = 0; i < gameState->dimension; i++) {
     free(gameState->crosswords[i]);
   }
+  free(gameState->crosswords);
   free(gameState);
 }
 
@@ -51,46 +65,102 @@ char getRandomChar() {
   return 'a' + letter;
 }
 
+int insertWordByPosition(Game* gameState, int direction, WordAuxForSearch* wordAux) {
+  int wordLength = strlen(wordAux->word);
+  int dimension = gameState->dimension;
+  int rowIncrement = DIRECTIONS_DIFFERENCES_ARR[direction][0];
+  int colIncrement = DIRECTIONS_DIFFERENCES_ARR[direction][1];
+
+  for(int startRow = 0; startRow < dimension; startRow++) {
+    for(int startCol = 0; startCol < dimension; startCol++) {
+      int lastCharOfWordIndex = wordLength - 1;
+      int currentRow = startRow + (rowIncrement * lastCharOfWordIndex);
+      int currentCol = startCol + (colIncrement * lastCharOfWordIndex);
+      if(currentRow >= dimension || currentCol >= dimension) continue;  // avoid out of bound for curr supported directions
+
+      // check if space is free
+      int canPlaceWordHere = 1;
+      for(int letterIndex = 0; letterIndex < wordLength; letterIndex++) {
+        int currentRow = startRow + (letterIndex * rowIncrement);
+        int currentCol = startCol + (letterIndex * colIncrement);
+        if(gameState->crosswords[currentRow][currentCol].direction != -1) {  // direction -1 means filled
+          canPlaceWordHere = 0;
+          break;
+        }
+      }
+
+      if(canPlaceWordHere) {
+        // insert word
+        wordAux->direction = direction;
+        wordAux->startRow = startRow;
+        wordAux->startCol = startCol;
+        for(int letterIndex = 0; letterIndex < wordLength; letterIndex++) {
+          int currentRow = startRow + (letterIndex * rowIncrement);
+          int currentCol = startCol + (letterIndex * colIncrement);
+          gameState->crosswords[currentRow][currentCol].val = wordAux->word[letterIndex];
+          gameState->crosswords[currentRow][currentCol].direction = direction;
+          gameState->crosswords[currentRow][currentCol].isVisible = 0;
+          gameState->crosswords[currentRow][currentCol].isStartOfWord = (letterIndex == 0);
+          gameState->crosswords[currentRow][currentCol].isEndOfWord = (letterIndex == wordLength - 1);
+        }
+        return 1;
+      }
+    }
+  }
+
+  return 0;
+}
+
+int insertWordRandomly(Game* gameState, WordAuxForSearch* wordAux) {
+  int possibleDirectionsArr[POSSIBLE_DIRECTIONS_AMOUNT] = {0, 1};
+  int insertedSuccessfully = 0;
+  int i = 0;
+
+  // testing all directions randomly one by one until one works
+  while(i < POSSIBLE_DIRECTIONS_AMOUNT) {
+    int lastValidDirectionPosition = POSSIBLE_DIRECTIONS_AMOUNT - 1 - i;
+    int currDirection = rand() % (lastValidDirectionPosition + 1);
+    // e.g 4 % 3 = 1, if we have 3 positions and our last valid index is 1, we want results from 0 to 1, so we use % 2 because: n % 2 <= 1
+    if(insertWordByPosition(gameState, possibleDirectionsArr[currDirection], wordAux)) {
+      insertedSuccessfully = 1;
+      break;
+    }
+    int lastDirectionPosition = possibleDirectionsArr[lastValidDirectionPosition];
+    possibleDirectionsArr[lastValidDirectionPosition] = possibleDirectionsArr[currDirection];
+    possibleDirectionsArr[currDirection] = lastDirectionPosition;
+    i++;
+  }
+
+  return insertedSuccessfully;
+}
+
 void createCrosswords(Game* gameState) {
   int dimension = gameState->dimension;
 
   gameState->crosswords = malloc(sizeof(Cell*) * dimension);
+  for(int row = 0; row < dimension; row++) {
+    gameState->crosswords[row] = malloc(sizeof(Cell) * dimension);
 
-  for(int i = 0; i < dimension; i++) {
-    gameState->crosswords[i] = malloc(sizeof(Cell) * dimension);
-
-    int j = 0;
-
-    if(i < gameState->wordsAmount) {  // n-1 words
-      while(j < strlen(gameState->wordsAuxForSearch[i].word) && j < dimension) {
-        gameState->crosswords[i][j].val = gameState->wordsAuxForSearch[i].word[j];
-        gameState->crosswords[i][j].isVisible = 0;  // make it randomly (we need x visible decide x based on n)
-        gameState->crosswords[i][j].direction = 0;
-        gameState->crosswords[i][j].isStartOfWord = j == 0;
-        gameState->crosswords[i][j].isEndOfWord = j + 1 == dimension;
-        if(j == 0) {
-          gameState->wordsAuxForSearch[i].startCol = i;
-          gameState->wordsAuxForSearch[i].startRow = j;
-        }
-        j++;
-      }
+    for(int col = 0; col < dimension; col++) {
+      gameState->crosswords[row][col].val = getRandomChar();
+      gameState->crosswords[row][col].isVisible = 1;
+      gameState->crosswords[row][col].direction = RANDOM_CHAR_EMPTY_DIRECTION;
+      gameState->crosswords[row][col].isStartOfWord = 0;
+      gameState->crosswords[row][col].isEndOfWord = 0;
     }
+  }
 
-    while(j < dimension) {  // fill remaining empty slots with a random char
-      gameState->crosswords[i][j].val = getRandomChar();
-      gameState->crosswords[i][j].direction = -1;  // random = invalid direction
-      gameState->crosswords[i][j].isVisible = 1;  // make it randomly (we need x visible decide x based on n)
-      gameState->crosswords[i][j].isStartOfWord = 0;
-      gameState->crosswords[i][j].isEndOfWord = 0;
-      j++;
-    }
+  for(int wordIndex = 0; wordIndex < gameState->wordsAmount; wordIndex++) {
+    insertWordRandomly(gameState, &gameState->wordsAuxForSearch[wordIndex]);
   }
 }
 
 void markAsFound(Game* gameState, WordAuxForSearch foundWord) {
-  // TODO: use direction here (now its only horizontal so i++) --> now it has a fixed col
+  int rowIncrement = DIRECTIONS_DIFFERENCES_ARR[foundWord.direction][0];
+  int colIncrement = DIRECTIONS_DIFFERENCES_ARR[foundWord.direction][1];
+
   for(int j = 0; j < strlen(foundWord.word); j++) {
-    gameState->crosswords[foundWord.startCol][foundWord.startRow + j].isVisible = 1;
+    gameState->crosswords[foundWord.startRow + (j * rowIncrement)][foundWord.startCol + (j * colIncrement)].isVisible = 1;
   }
 }
 
@@ -98,10 +168,9 @@ void searchWordAndUpdateTable(Game* gameState, char* word) {
   int foundWordIndex = -1;
 
   for(int i = 0; i < gameState->wordsAmount; i++) {
-    // Could use a hashtable here for exact match - maybe other time..
     if(strcmp(gameState->wordsAuxForSearch[i].word, word) == 0) {
       foundWordIndex = i;
-      continue;
+      break;
     }
   }
 
@@ -162,7 +231,7 @@ int main() {
   srand(time(NULL));
 
   Game* gameState = malloc(sizeof(Game));
-  // int n = 3;
+  gameState->foundWords = 0;
   int n = 0;
   while(n < 3) {
     printf("give me the size of crosswords (3 <= n <= 10): ");

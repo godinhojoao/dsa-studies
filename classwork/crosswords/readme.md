@@ -1,0 +1,1 @@
+docker build -t valgrind-runner . && docker run valgrind-runner && docker run --rm valgrind-runner
