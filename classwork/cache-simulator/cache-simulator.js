@@ -1,167 +1,219 @@
-// 32-bit addresses
-// review all TODO:
-// TODO: implement random replacement policy
-// TODO: still not working for 2-way, 4-way, or fully associative
-// TODO: review the professor's PDF to check if anything else is missing
 import fs from "fs";
 import { fileURLToPath } from "node:url";
 import path from "path";
 
-// import.meta.url --> url of curr file
-// fileURLToPath --> understandable OS path (windows or unix)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const NUM_OF_SETS = Number(process.argv[2]);
-const BLOCK_SIZE = Number(process.argv[3]);
-const ASSOCIATIVITY = Number(process.argv[4]);
-const IS_SPLITTED = process.argv[5] === "true";
+// number:number:number
+function getCacheConfig(configString) {
+  // default config when none is provided: 1024 sets, block size 4, associativity 1
+  if (!configString) {
+    return {
+      numOfSets: 1024,
+      blockSize: 4,
+      associativity: 1,
+    };
+  }
 
-console.log("\n-------");
-console.log("NUM_OF_SETS", NUM_OF_SETS);
-console.log("BLOCK_SIZE", BLOCK_SIZE);
-console.log("ASSOCIATIVITY", ASSOCIATIVITY);
-console.log("IS_SPLITTED", IS_SPLITTED);
-console.log("-------\n");
+  const [numSets, blockSize, associativity] = configString.split(":").map(Number);
+  // & bitwise and; compares each bit and returns 1 only if both are 1
+  // example: 8 (1000) & 7 (0111) = 0, but 6 (0110) & 5 (0101) = 4
+  // log2 here didn't work well because of huge numbers and the float precision issue with Math.log2
+  const isPowerOfTwo = (n) => n > 0 && (n & (n - 1)) === 0;
 
-const hasInvalidNumberParam =
-  Number.isNaN(NUM_OF_SETS) ||
-  Number.isNaN(BLOCK_SIZE) ||
-  Number.isNaN(ASSOCIATIVITY) ||
-  NUM_OF_SETS <= 0 ||
-  BLOCK_SIZE <= 0 ||
-  ASSOCIATIVITY <= 0;
+  // block size must be at least 4 bytes since we read 32bit words (4bytes)
+  if (!numSets || !blockSize || !associativity || blockSize < 4) {
+    throw new Error("Invalid config");
+  }
+  if (!isPowerOfTwo(blockSize) || !isPowerOfTwo(numSets) || !isPowerOfTwo(associativity)) {
+    throw new Error("Invalid config");
+  }
 
-const isInvalidSplitParam = !["true", "false"].includes(process.argv[5]);
-if (hasInvalidNumberParam || isInvalidSplitParam) {
-  console.log("hasInvalidNumberParam", hasInvalidNumberParam);
-  console.log("isInvalidSplitParam", isInvalidSplitParam);
-  throw new Error(
-    "received invalid params -- check debug flags above and fix your sent params"
-  );
+  return { numOfSets: numSets, blockSize: blockSize, associativity: associativity };
 }
 
-const OFFSET_BITS_AMOUNT = Math.log2(BLOCK_SIZE);
-const INDEX_BITS_AMOUNT = Math.log2(NUM_OF_SETS);
+const IS_SPLITTED = process.argv.length === 5;
+const config1 = getCacheConfig(process.argv[2]);
+const config2 = IS_SPLITTED ? getCacheConfig(process.argv[3]) : null;
+let inputFile = process.argv[IS_SPLITTED ? 4 : 3];
+if (!inputFile) {
+  inputFile = "input.txt";
+}
 
-function CacheBuilder({ cacheAccesses }) {
-  console.log("cacheAccesses", cacheAccesses);
-  let missCount = 0;
-  let hitCount = 0;
+function readInput(fileName) {
+  const filePath = path.isAbsolute(fileName) ? fileName : path.join(__dirname, fileName);
+  // binary file logic
+  // if (fileName.endsWith('.bin')) {
+  // TODO: it isn't working correctly
+  // }
 
-  const validBitArr = new Array(NUM_OF_SETS).fill(0);
-  const tagsArr = new Array(NUM_OF_SETS).fill(0);
+  const lines = fs.readFileSync(filePath, "utf-8")
+    .split("\n")
+    .filter(line => line.trim());
 
-  cacheAccesses.forEach((data) => {
-    // TODO: review these calcs again -- debug
-    const index = NUM_OF_SETS === 1 ? 0 : (data.address >> OFFSET_BITS_AMOUNT) & ((1 << INDEX_BITS_AMOUNT) - 1);
-    const tag = data.address >> (OFFSET_BITS_AMOUNT + INDEX_BITS_AMOUNT);
+  const result = [];
+  // reading two by two i+=2
+  for (let i = 0; i < lines.length; i += 2) {
+    if (i + 1 < lines.length) {
+      result.push({ address: Number(lines[i]), type: Number(lines[i + 1]) });
+    }
+  }
+  return result;
+}
 
-    if (validBitArr[index] == 0) {
-      missCount++;
-      validBitArr[index] = 1;
-      tagsArr[index] = tag;
-    } else {
-      if (tagsArr[index] == tag) {
-        hitCount++;
-      } else {
-        missCount++;
-        validBitArr[index] = 1;
-        tagsArr[index] = tag;
+class Cache {
+  constructor(name, numOfSets, blockSize, associativity) {
+    this.name = name;
+    this.numOfSets = numOfSets;
+    this.associativity = associativity;
+    this.blockSize = blockSize;
+    this.bitsOffset = Math.log2(blockSize);
+    this.bitsIndex = Math.log2(numOfSets);
+    this.accesses = 0;
+    this.hits = 0;
+    this.totalMisses = 0;
+    this.compulsoryMiss = 0;
+    this.conflictMiss = 0; // sending some capacity misses to conflict misses (to simplify)
+    this.cacheSize = numOfSets * blockSize * associativity;
+    this.cache = Array(numOfSets) // cache[sets][associativity]
+      .fill(null)
+      .map(() =>
+        Array(associativity)
+          .fill(null)
+          .map(() => ({
+            validBit: false,
+            tag: 0,
+          }))
+      );
+  }
+
+  search(address) {
+    this.accesses++;
+
+    // >>> shifts bits right and fills left with zeros (treats number as unsigned)
+    // index: which set in the cache
+    const index = this.bitsIndex === 0
+      ? 0
+      : (address >>> this.bitsOffset) & ((1 << this.bitsIndex) - 1);
+
+    // tag: upper bits that identify the block
+    const tag = address >>> (this.bitsOffset + this.bitsIndex);
+
+    if (this.associativity === 1) {
+      return this.searchDirectMapped(index, tag);
+    }
+
+    return this.searchSetAssociative(index, tag);
+  }
+
+  searchDirectMapped(index, tag) {
+    const line = this.cache[index][0];
+
+    if (!line.validBit) {
+      this.compulsoryMiss++;
+      this.insert(index, tag);
+      return;
+    }
+
+    if (line.tag === tag) {
+      this.hits++;
+      return;
+    }
+
+    // validBit true but tag not matching = conflict miss
+    this.conflictMiss++;
+    this.insert(index, tag);
+  }
+
+  searchSetAssociative(index, tag) {
+    // check for hit in any way
+    for (let i = 0; i < this.associativity; i++) {
+      // this for is simulating the multiple comparators a cache contains in hardware
+      const line = this.cache[index][i];
+      if (line.validBit && line.tag === tag) {
+        this.hits++;
+        return;
       }
     }
-  });
 
-  return {
-    totalAccesses: cacheAccesses.length,
-    hitCount,
-    hitRatio: ((hitCount / cacheAccesses.length) * 100).toFixed(2) + "%",
-    missCount,
-    missRatio: ((missCount / cacheAccesses.length) * 100).toFixed(2) + "%",
-    validBitArr,
-    tagsArr,
-  };
-}
-
-function getFormattedInput() {
-  // not best way - putting all input.txt into RAM - but we don't care for it here.
-  // instead use a stream to process in chunks
-  const inputFileText = fs.readFileSync(
-    path.join(__dirname, "input.txt"),
-    "utf-8"
-  );
-  const formattedInput = inputFileText
-    .split("\n")
-    .filter((val) => !!val)
-    .map((val) => {
-      const splittedLine = val.split(",");
-      const address = Number(splittedLine[0].trim());
-
-      if (Number.isNaN(address)) {
-        throw new Error("received invalid address on input.txt - only numbers");
+    // we didn't find the address to make a hit
+    // so now let's find a place to put it in the cache
+    for (let i = 0; i < this.associativity; i++) {
+      if (!this.cache[index][i].validBit) {
+        this.compulsoryMiss++;
+        this.insert(index, tag);
+        return;
       }
-      const addressType = splittedLine[1].trim();
-      if (
-        IS_SPLITTED &&
-        (!splittedLine[1] || !["i", "d"].includes(addressType))
-      ) {
-        throw new Error(
-          "splitted cache missing address type or received an invalid type (valid types: i or d) on input.txt file"
-        );
-      }
+    }
 
-      return {
-        address,
-        type: IS_SPLITTED ? addressType : null, // i = instruction, d = data or NULL if not splitted
-      };
+    // all lines and columns were full, conflict miss
+    this.conflictMiss++;
+    // actually this would be a capacity miss but i'm not tracking it
+    this.insert(index, tag);
+  }
+
+  insert(index, tag) {
+    // direct mapped insert the value using only index
+    if (this.associativity === 1) {
+      this.cache[index][0].validBit = true;
+      this.cache[index][0].tag = tag;
+      return;
+    }
+
+    // if not direct mapped, we need to find an empty way or replace a filled one
+    // find empty way
+    for (let i = 0; i < this.associativity; i++) {
+      if (!this.cache[index][i].validBit) {
+        this.cache[index][i].validBit = true;
+        this.cache[index][i].tag = tag;
+        return;
+      }
+    }
+
+    // alL ways full, replace one randomly
+    const target = Math.floor(Math.random() * this.associativity);
+    this.cache[index][target].validBit = true;
+    this.cache[index][target].tag = tag;
+  }
+
+  printLog() {
+    this.totalMisses = this.compulsoryMiss + this.conflictMiss;
+
+    const hitRatio = this.accesses === 0 ? 0 : this.hits / this.accesses;
+    const missRatio = this.accesses === 0 ? 0 : this.totalMisses / this.accesses;
+
+    console.log(`\nCache ${this.name} Report`);
+    console.table({
+      "Cache size (bytes)": this.cacheSize,
+      "Sets": this.numOfSets,
+      "Associativity": this.associativity,
+      "Block size (bytes)": this.blockSize,
+      "Accesses": this.accesses,
+      "Hits": this.hits,
+      "Misses": this.totalMisses,
+      "Compulsory misses": this.compulsoryMiss,
+      "Conflict misses": this.conflictMiss,
+      "Hit rate": hitRatio.toFixed(6),
+      "Miss rate": missRatio.toFixed(6)
     });
-  return formattedInput;
-}
-const formattedInput = getFormattedInput();
-if (!(formattedInput && formattedInput.length)) {
-  throw new Error(
-    "Something went wrong with input file -- check if the format is valid"
-  );
+  }
 }
 
-function showReport({ currCache, prefix }) {
-  console.log(`\n---${prefix}----`);
-  console.log("totalAccesses", currCache.totalAccesses);
-  console.log("hitCount", currCache.hitCount);
-  console.log("hitRatio", currCache.hitRatio);
-  console.log("missCount", currCache.missCount);
-  console.log("missRatio", currCache.missRatio);
-  // just to debug if needed
-  // console.log('validBitArr', currCache.validBitArr)
-  // console.log('tagsArr', currCache.tagsArr)
-  console.log("-------\n");
-}
-
+const input = readInput(inputFile);
 if (IS_SPLITTED) {
-  const splittedCaches = formattedInput.reduce(
-    (prev, curr) => {
-      const instructionAddresses = prev.instructionAddresses;
-      const dataAddresses = prev.dataAddresses;
-      curr.type === "i"
-        ? instructionAddresses.push(curr)
-        : dataAddresses.push(curr);
-      return {
-        instructionAddresses,
-        dataAddresses,
-      };
-    },
-    { instructionAddresses: [], dataAddresses: [] }
-  );
-
-  const DataCache = CacheBuilder({
-    cacheAccesses: splittedCaches.dataAddresses,
-  });
-  const InstructionsCache = CacheBuilder({
-    cacheAccesses: splittedCaches.instructionAddresses,
-  });
-  showReport({ currCache: DataCache, prefix: "DataCache" });
-  showReport({ currCache: InstructionsCache, prefix: "InstructionsCache" });
+  const iCache = new Cache("iL1", config1.numOfSets, config1.blockSize, config1.associativity);
+  const dCache = new Cache("dL1", config2.numOfSets, config2.blockSize, config2.associativity);
+  for (const { address, type } of input) {
+    const cache = type === 0 ? iCache : dCache;
+    cache.search(address);
+  }
+  iCache.printLog();
+  dCache.printLog();
 } else {
-  const MainCache = CacheBuilder({ cacheAccesses: formattedInput });
-  showReport({ currCache: MainCache, prefix: "MainCache" });
+  const cache = new Cache("L1", config1.numOfSets, config1.blockSize, config1.associativity);
+  for (const { address } of input) {
+    cache.search(address);
+  }
+  cache.printLog();
 }
