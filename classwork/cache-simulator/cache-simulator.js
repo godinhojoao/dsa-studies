@@ -23,7 +23,7 @@ function getCacheConfig(configString) {
   const isPowerOfTwo = (n) => n > 0 && (n & (n - 1)) === 0;
 
   // block size must be at least 4 bytes since we read 32bit words (4bytes)
-  if (!numSets || !blockSize || !associativity || blockSize < 4) {
+  if (!numSets || !blockSize || !associativity) {
     throw new Error("Invalid config");
   }
   if (!isPowerOfTwo(blockSize) || !isPowerOfTwo(numSets) || !isPowerOfTwo(associativity)) {
@@ -205,7 +205,7 @@ if (IS_SPLITTED) {
   const iCache = new Cache("iL1", config1.numOfSets, config1.blockSize, config1.associativity);
   const dCache = new Cache("dL1", config2.numOfSets, config2.blockSize, config2.associativity);
   for (const { address, type } of input) {
-    const cache = type === 0 ? iCache : dCache;
+    const cache = type === 0 ? iCache : dCache; // 0 = instruction 1 = data
     cache.search(address);
   }
   iCache.printLog();
