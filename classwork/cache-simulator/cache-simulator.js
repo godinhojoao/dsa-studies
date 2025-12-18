@@ -137,19 +137,7 @@ class Cache {
       }
     }
 
-    // we didn't find the address to make a hit
-    // so now let's find a place to put it in the cache
-    for (let i = 0; i < this.associativity; i++) {
-      if (!this.cache[index][i].validBit) {
-        this.compulsoryMiss++;
-        this.insert(index, tag);
-        return;
-      }
-    }
-
-    // all lines and columns were full, conflict miss
-    this.conflictMiss++;
-    // actually this would be a capacity miss but i'm not tracking it
+    // no hit found, insert randomly
     this.insert(index, tag);
   }
 
@@ -161,17 +149,23 @@ class Cache {
       return;
     }
 
-    // if not direct mapped, we need to find an empty way or replace a filled one
-    // find empty way
+    // if not direct mapped, check if any empty slot exists for miss classification
+    let hasEmptySlot = false;
     for (let i = 0; i < this.associativity; i++) {
       if (!this.cache[index][i].validBit) {
-        this.cache[index][i].validBit = true;
-        this.cache[index][i].tag = tag;
-        return;
+        hasEmptySlot = true;
+        break;
       }
     }
 
-    // alL ways full, replace one randomly
+    // classify miss type
+    if (hasEmptySlot) {
+      this.compulsoryMiss++;
+    } else {
+      this.conflictMiss++;
+    }
+
+    // insert randomly
     const target = Math.floor(Math.random() * this.associativity);
     this.cache[index][target].validBit = true;
     this.cache[index][target].tag = tag;
