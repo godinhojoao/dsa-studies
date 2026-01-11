@@ -188,8 +188,62 @@ void demoStdLibAlgorithms() {}
 
 void demoMemManagement() {}
 
-void demoTemplates() {}
+// func template accepting only int and double
+template <typename T>
+T maxVal(T a) {
+  static_assert(
+      std::is_same<T, int>::value ||
+          std::is_same<T, double>::value,
+      "Only int or double allowed");
+  return a;
+}
 
+// class template
+template <typename T>
+class Box {
+ public:
+  T value;
+  Box(T v) : value(v) {}
+
+  void show() {
+    std::cout << "show generic class template value: " << value << "\n";
+  }
+};
+
+// template specialization
+template <>
+class Box<int> {
+ public:
+  int value;
+  Box(int v) : value(v) {}
+  void show() { std::cout << "int: " << value << "\n"; }
+
+  void customMethodForIntBoxOnly() {
+    std::cout << "customMethodForIntBoxOnly\n";
+  }
+};
+
+// https://www.learncpp.com/cpp-tutorial/function-templates/
+void demoTemplates() {
+  // func template
+  maxVal(3);
+  maxVal(2.5);
+  // maxVal('a');  // compile time error since the static_assert fails
+  maxVal<int>('a');  // force int cast bypass the static_assert in compile time
+
+  // class template + template specialization
+  Box<int> a(3);
+  a.show();
+  a.customMethodForIntBoxOnly();
+  Box<double> b(2.5);
+  b.show();
+  // b.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member "customMethodForIntBoxOnly"C/C++(135)
+  Box<std::string> c("testing");
+  c.show();
+  // c.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member "customMethodForIntBoxOnly"C/C++(135)
+}
+
+// demoNamespaces:
 namespace calculator {
 void sum(int a, int b) {
   std::cout << "sum: " << a + b << "\n";
@@ -201,6 +255,11 @@ void subtract(int a, int b) {
 
 namespace outer {
 namespace inner {
+
+// variables inside namespace
+int configtest = 100;
+const double pi = 3.14159;
+
 void hello() { std::cout << "Hello\n"; }
 }  // namespace inner
 }  // namespace outer
@@ -220,18 +279,53 @@ class Test {
 };
 }  // namespace
 
+// convention (namespace "detail" to put implementation details in which users should not touch)
+namespace myLib {
+using std::cout;  // brings only cout from std into this namespace;
+// other names are NOT imported and are still accessible only via std::
+
+// namespace as alias (it doesn't work for variables):
+namespace io = std;
+
+// using as type alias:
+using IntVec = std::vector<int>;
+
+namespace detail {
+void helper() {
+  IntVec v;
+  v.push_back(1);
+
+  int x;
+  cout << "internal from detail, do not touch\n";
+  // cin >> x;  // identifier "cin" is undefinedC/C++(20)
+}
+}  // namespace detail
+
+void run() {
+  detail::helper();
+}
+}  // namespace myLib
+
+// Convention: avoid polluting the global scope; create a namespace for your functions, classes, etc.
+
 void demoNamespaces() {
   // namespaces are above this func:
   calculator::sum(12, 3);
   calculator::subtract(1, 1);
 
   outer::inner::hello();
+  std::cout << "outer::inner::configtest: " << outer::inner::configtest << "\n";
+  std::cout << "outer::inner::pi: " << outer::inner::pi << "\n";
 
   namespace test = std;
   test::cout << "test worked" << "\n";
 
-  Test t(3);  // access class via namespace
+  Test t(3);  // access class via anonymous namespace, so we made it only available for this file
   t.show();
+
+  myLib::run();
+  myLib::cout << "test\n";
+  myLib::io::cout << "test2\n";
 }
 
 void demoFileStreams() {}
@@ -247,12 +341,12 @@ int main() {
 
   demoStdLibContainers();  //not done add more std lib stuff
 
-  demoStdLibAlgorithms();  //not done add more std lib stuff
+  // demoStdLibAlgorithms();  //not done add more std lib stuff
 
-  demoMemManagement();  // not done -> compare heap, std lib, stack, etc.. Dynamic memory, new, delete, etc.. new[] delete[]
+  // demoMemManagement();  // not done -> compare heap, std lib, stack, etc.. Dynamic memory, new, delete, etc.. new[] delete[], smart pointers std::unique_ptr, std::shared_ptr
   // talk about RAII inside it
 
-  demoTemplates();  // not done -> function templates, class templates, generic programming
+  // demoTemplates();
 
   // demoNamespaces();
 
