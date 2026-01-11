@@ -6,14 +6,17 @@
 #define N 3
 constexpr int M = 3;  // better in c++ type safety
 
-// https://www.geeksforgeeks.org/cpp/containers-cpp-stl/
 // "A container is a holder object that stores a collection of other objects"
 template <typename Container>  // using a template to accept a generic type (name container is for convenience not a required name)
 
 // Container a -> copy
 // Container& a -> original, writable ---> in C we would receive a pointer to modify the original, for example: int a*
 // const Container& a -> original and read-only
-void printArrayUtility(const Container& a, size_t size) {
+void printArrayUtility(const std::string prefix, const Container& a, size_t size) {
+  if(!prefix.empty()) {
+    std::cout << prefix + ": ";
+  }
+
   for(int i = 0; i < size; i++) {
     char limiter = i == size - 1 ? '\n' : '-';
     std::cout << a[i] << limiter;
@@ -171,23 +174,34 @@ void demoHandlingExceptions() {
   }
 }
 
+// https://cplusplus.com/reference/stl/
+// https://www.youtube.com/watch?v=6OoSgY6NVVk
 void demoStdLibContainers() {
   int arr[3] = {1, 2, 3};
-  printArrayUtility(arr, sizeof(arr) / sizeof(int));
+  printArrayUtility("arr in stack", arr, sizeof(arr) / sizeof(int));
+
+  // #Fixed size array -> usually on stack but if global or static will be on heap
+  // continguous same as c arr on stack
+  std::array<int, 3> a = {1, 2, 3};
+  printArrayUtility("std::arr", a, a.size());
 
   // #Dynamic array with std::vector -> memory managed automatically (badass) #include <vector>
+  // continguous same as c arr on stack and can reallocate on growth
+  // push_back is not always O(1); it becomes O(n) when the vector reallocates upon reaching its capacity
+  // Don’t store pointers to vectors; resizing can invalidate them.
   // ->multiple built-in functions like resize, push_back, pop_back, empty (returns true if is empty), shrink_to_fit, swap(another vec), at
   // --> vec[4] is unsafe if out of bounds because it does NOT perform bounds checking
   // --> vec.at(4) is safe: throws std::out_of_range if the index is out of bounds
   std::vector<int> numVec = {1, 2, 3, 4};
   numVec.push_back(5);
-  printArrayUtility(numVec, numVec.size());
+  printArrayUtility("std::vector", numVec, numVec.size());
 }
 
 void demoStdLibAlgorithms() {}
 
 void demoMemManagement() {}
 
+// demoTemplates:
 // func template accepting only int and double
 template <typename T>
 T maxVal(T a) {
@@ -339,7 +353,7 @@ int main() {
 
   // demoHandlingExceptions();
 
-  demoStdLibContainers();  //not done add more std lib stuff
+  // demoStdLibContainers();  //not done add more std lib stuff
 
   // demoStdLibAlgorithms();  //not done add more std lib stuff
 
