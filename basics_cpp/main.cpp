@@ -1,3 +1,4 @@
+#include <fstream>  // file stream
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -342,7 +343,31 @@ void demoNamespaces() {
   myLib::io::cout << "test2\n";
 }
 
-void demoFileStreams() {}
+// https://cplusplus.com/reference/fstream/
+void demoFileStreams() {
+  // !!!!! it handles unicode for us automatically without making switch cases or if's statements to handle utf-8 or etc
+  // std::ifstream (input) -> read files
+  // std::ofstream (output) -> write files
+
+  std::ifstream inFile;
+  inFile.open("widecharfile.txt");
+  if(!inFile) throw std::runtime_error("Cannot open input.txt");
+  std::cout << "inFile.is_open: " << (inFile.is_open() ? "yes" : "not") << "\n";
+
+  std::ofstream outFile("output.txt");  // another way to open file
+  if(!outFile) throw std::runtime_error("Cannot open output.txt");
+  std::cout << "outFile.is_open: " << (outFile.is_open() ? "yes" : "not") << "\n";
+
+  // 1. reading line by line and processing without holding entire file content
+  std::string line;
+  while(std::getline(inFile, line)) {
+    std::cout << "line: " << line << "\n";
+    outFile.write(line.c_str(), line.size());  //std::string c_str method returns a raw char pointer (char*) with null terminator
+    outFile.put('\n');
+  }
+  inFile.close();
+  outFile.close();
+}
 
 int main() {
   // printDirectives();
@@ -364,6 +389,6 @@ int main() {
 
   // demoNamespaces();
 
-  // demoFileStreams(); // not done
+  // demoFileStreams();
   return 0;
 }
