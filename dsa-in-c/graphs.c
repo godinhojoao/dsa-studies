@@ -8,7 +8,7 @@ Undirected and complete graph for cities, version with adjacency matrix and also
 
 Time and Space Complexity:
 
-v = vertices = cities
+v = vertices = nodes = cities
 e = edges = path between cities
 
 Matrix big o notation (worst case):
@@ -26,10 +26,21 @@ Matrix big o notation (worst case):
   - space: O(1) dont alloc any new space for this.
 
 Adjacency list:
-  - funcname: O() -> because...
-  - funcname: O() -> because...
+- addNewCityWithAllEdgesListGraph:
+  - time: O(v) loop v-1 cities to connect this city with others
+  - space: O(v) because of the new v-1 new edges (undirected graph we connect this new city with all others)
+- removeCityAndAllEdgesListGraph:
+  - time: O(v+e) for each city we access its edges to remove connection with removed city
+  - space: O(1) dont alloc any new space
+- getDistanceBetweenCitiesListGraph:
+  - time: O(V) if the graph is dense edges of v ~= V, so: O(V)
+    - because we iterate all edges of v.
+  - space: O(1) dont alloc any new space for this.
+- editDistanceBetweenCitiesListGraph:
+  - time: O(V) if the graph is dense edges of v ~= V, so: O(V)
+    - because we iterate all edges of v.
+  - space: O(1) dont alloc any new space for this.
 */
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +52,7 @@ struct City {
   double yPos;
 } typedef City;
 
+// matrix start
 struct MatrixGraphController {
   double** matrix;
   int currentDimension;
@@ -52,7 +64,8 @@ struct MatrixGraphController {
 // https://en.wikipedia.org/wiki/Euclidean_distance
 double calcCitiesEuclideanDistance(City source, City destination) {
   double distance = sqrt(pow(source.xPos - destination.xPos, 2) + pow(source.yPos - destination.yPos, 2));
-  printf("just to debug: source.id: %d to destination.id %d -> distance: %.2f\n", source.id, destination.id, distance);
+  // printf("calcCitiesEuclideanDistance debug: source.id: %d to destination.id %d -> distance: %.2f\n",
+  // source.id,destination.id, distance);
   return distance;
 }
 
@@ -179,9 +192,14 @@ void editDistanceBetweenCitiesMatrix(MatrixGraphController* graph, int srcCityId
 
   graph->matrix[srcMatrixIdx][destMatrixIdx] = newDistance;
   graph->matrix[destMatrixIdx][srcMatrixIdx] = newDistance;
+  printf("edited city %d to city %d newdistance = %.2f\n", srcCityId, destCityId, newDistance);
 }
 
 double getDistanceBetweenCitiesMatrix(MatrixGraphController* graph, int srcCityId, int destCityId) {
+  if(srcCityId == destCityId) {
+    return 0;
+  }
+
   int isOutOfBoundId = srcCityId < 0 || srcCityId > graph->maxCityId || destCityId < 0 || destCityId > graph->maxCityId;
   if(isOutOfBoundId) {
     return -1;
@@ -242,10 +260,15 @@ void matrixImplementation(City cities[], int totalCities) {
     }
   }
 
+  printf("\n--------------------testing matrix impl start--------------------\n");
   printf("distance between cities 1 and 1: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 1, 1));
   printf("distance between cities 1 and 2: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 1, 2));
   printf("distance between cities 3 and 4: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 3, 4));
   printf("distance between cities 4 and 4: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 4, 4));
+
+  editDistanceBetweenCitiesMatrix(graph, 3, 2, 10);
+  printf("distance between cities 3 and 2: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 3, 2));
+  printf("distance between cities 2 and 3: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 2, 3));
 
   removeCityAndAllEdgesMatrix(graph, 1);
   printf("distance between cities 1 and 2: %.2f\n", getDistanceBetweenCitiesMatrix(graph, 1, 2));
@@ -253,9 +276,243 @@ void matrixImplementation(City cities[], int totalCities) {
 
   printf("distance between cities 3 and 10 (city 10 doesn't exist): %.2f\n",
          getDistanceBetweenCitiesMatrix(graph, 3, 10));
+  printf("--------------------testing matrix impl end --------------------\n\n");
 
   freeEntireGraphMatrix(graph);
 }
+// matrix end
+
+// adjacency list start
+struct Edge {
+  int destId;
+  double distance;
+  struct Edge* next;
+} typedef Edge;
+
+struct AdjListGraph {
+  int totalVertices;
+  Edge** adjLists;
+  // idea
+  // adjListGraph->adjLists[5] represents the city with id 5
+  // adjListGraph->adjLists[5] if null = city exist but is without connections, just a node
+  // adjListGraph->adjLists[5] if edge information = city with connection to destId
+} typedef AdjListGraph;
+
+Edge* createEdge(int destId, double distance) {
+  Edge* newEdge = malloc(sizeof(Edge));
+  newEdge->destId = destId;
+  newEdge->distance = distance;
+  newEdge->next = NULL;
+  return newEdge;
+}
+
+void addBothWaysConnectionBetweenCitiesListGraph(AdjListGraph* graph, int srcCityId, int destCityId, double distance) {
+  int srcIdx = srcCityId - 1;
+  int destIdx = destCityId - 1;
+  if(srcIdx < 0 || srcIdx >= graph->totalVertices || destIdx < 0 || destIdx >= graph->totalVertices) {
+    printf("addBothWaysConnectionBetweenCitiesListGraph: one invalid id was provided\n");
+    return;
+  }
+
+  // inserting on head O(1)
+  Edge* edgeFromSrcToDest = createEdge(destCityId, distance);
+  edgeFromSrcToDest->next = graph->adjLists[srcIdx];
+  graph->adjLists[srcIdx] = edgeFromSrcToDest;
+
+  Edge* edgeFromDestToSrc = createEdge(srcCityId, distance);
+  edgeFromDestToSrc->next = graph->adjLists[destIdx];
+  graph->adjLists[destIdx] = edgeFromDestToSrc;
+}
+
+void addNewCityWithAllEdgesListGraph(AdjListGraph* graph, City cities[], int cityToInsertId) {
+  int srcIdx = cityToInsertId - 1;
+  if(srcIdx != graph->totalVertices) {
+    // in my workaround I use cityId-1 as idx because I ENSURE input city id is always +1 incremented
+    printf("addNewCityWithAllEdgesListGraph: an invalid id was provided\n");
+    return;
+  }
+
+  Edge** newAdjListAfterRealloc = realloc(graph->adjLists, sizeof(Edge*) * (graph->totalVertices + 1));
+  if(newAdjListAfterRealloc == NULL) {
+    printf("realloc failed at addNewCityWithAllEdgesListGraph..\n");
+    exit(1);
+  }
+  graph->adjLists = newAdjListAfterRealloc;
+  graph->adjLists[srcIdx] = NULL;
+  graph->totalVertices++;
+
+  for(int i = 0; i < graph->totalVertices - 1; i++) {
+    double distance = calcCitiesEuclideanDistance(cities[i], cities[cityToInsertId - 1]);
+    addBothWaysConnectionBetweenCitiesListGraph(graph, i + 1, cityToInsertId, distance);
+  }
+}
+
+void removeCityAndAllEdgesListGraph(AdjListGraph* graph, int cityToDeleteId) {
+  int idxToRemove = cityToDeleteId - 1;
+  if(idxToRemove < 0 || idxToRemove >= graph->totalVertices) {
+    printf("removeCityAndAllEdgesListGraph invalid city id\n");
+    return;
+  }
+
+  for(int i = 0; i < graph->totalVertices; i++) {
+    if(i == idxToRemove) {
+      continue;  // skip deleted one of copying
+    }
+
+    Edge* prevCityNodeTemp = NULL;
+    Edge* currCityNodeTemp = graph->adjLists[i];
+
+    // unlink the removed city inside the others and free edge between them
+    while(currCityNodeTemp != NULL) {
+      int isEdgeToRemove = currCityNodeTemp->destId == cityToDeleteId;
+      if(!isEdgeToRemove) {
+        prevCityNodeTemp = currCityNodeTemp;
+        currCityNodeTemp = currCityNodeTemp->next;
+        continue;
+      }
+
+      Edge* nextEdge = currCityNodeTemp->next;
+      int isCityToRemoveAtFirstEdge = prevCityNodeTemp == NULL;
+      if(isCityToRemoveAtFirstEdge) {
+        graph->adjLists[i] = nextEdge;  // first, just skip the one to remove
+      } else {
+        prevCityNodeTemp->next =
+            nextEdge;  // not first so we need to do that in order to keep other nodes in the linked list.
+      }
+      free(currCityNodeTemp);
+      currCityNodeTemp = nextEdge;
+    }
+  }
+
+  // free all edges of the city itself
+  Edge* currEdge = graph->adjLists[idxToRemove];
+  while(currEdge != NULL) {
+    Edge* tempNextEdge = currEdge->next;
+    free(currEdge);
+    currEdge = tempNextEdge;
+  }
+
+  graph->adjLists[idxToRemove] = NULL;  // mark city as null = deleted
+
+  printf("City with id: %d was deleted\n", cityToDeleteId);
+}
+
+void editDistanceBetweenCitiesListGraph(AdjListGraph* graph, int srcCityId, int destCityId, double newDistance) {
+  int srcIdx = srcCityId - 1;
+  int destIdx = destCityId - 1;
+  if(srcIdx < 0 || srcIdx >= graph->totalVertices || destIdx < 0 || destIdx >= graph->totalVertices) {
+    printf("editDistanceBetweenCitiesListGraph: one invalid id was provided\n");
+    return;
+  }
+
+  if(graph->adjLists[srcIdx] == NULL || graph->adjLists[destIdx] == NULL) {
+    printf("editDistanceBetweenCitiesListGraph one invalid id was provided\n");
+    return;
+  }
+
+  Edge* srcToDestCurrEdge = graph->adjLists[srcIdx];
+  while(srcToDestCurrEdge != NULL && srcToDestCurrEdge->destId != destCityId) {
+    srcToDestCurrEdge = srcToDestCurrEdge->next;
+  }
+
+  if(srcToDestCurrEdge == NULL) {
+    printf("editDistanceBetweenCitiesListGraph city %d isn't connected to city %d, invalid edit\n", srcCityId,
+           destCityId);
+    return;
+  }
+  srcToDestCurrEdge->distance = newDistance;
+
+  // now the inverse since this is an undirected graph
+  Edge* destToSrcCurrentEdge = graph->adjLists[destIdx];
+  while(destToSrcCurrentEdge != NULL && destToSrcCurrentEdge->destId != srcCityId) {
+    destToSrcCurrentEdge = destToSrcCurrentEdge->next;
+  }
+  destToSrcCurrentEdge->distance = newDistance;
+
+  printf("edited city %d to city %d newdistance = %.2f\n", srcCityId, destCityId, newDistance);
+}
+
+double getDistanceBetweenCitiesListGraph(AdjListGraph* graph, int srcCityId, int destCityId) {
+  if(srcCityId == destCityId) {
+    return 0;
+  }
+
+  int srcIdx = srcCityId - 1;
+  int destIdx = destCityId - 1;
+
+  if(srcIdx < 0 || srcIdx >= graph->totalVertices || destIdx < 0 || destIdx >= graph->totalVertices) {
+    return -1;
+  }
+
+  if(graph->adjLists[srcIdx] == NULL || graph->adjLists[destIdx] == NULL) {
+    return -1;
+  }
+
+  Edge* currEdge = graph->adjLists[srcIdx];
+  while(currEdge != NULL) {
+    if(currEdge->destId == destCityId) {
+      return currEdge->distance;
+    }
+    currEdge = currEdge->next;
+  }
+  return -1;  // disconnected cities
+}
+
+void freeEntireGraphList(AdjListGraph* graph) {  // O(V+E)
+  if(graph == NULL) {
+    return;
+  }
+
+  for(int i = 0; i < graph->totalVertices; i++) {  // vertices
+    Edge* currEdge = graph->adjLists[i];
+    while(currEdge != NULL) {  // edges of current node (not all edges) this is the reason is v+e instead of times e
+      Edge* tempEdge = currEdge->next;
+      free(currEdge);
+      currEdge = tempEdge;
+    }
+  }
+  free(graph->adjLists);
+  free(graph);
+}
+
+void adjacencyListImplementation(City cities[], int totalCities) {
+  AdjListGraph* graph = malloc(sizeof(AdjListGraph));
+  graph->totalVertices = totalCities;
+  graph->adjLists = malloc(sizeof(Edge*) * graph->totalVertices);
+
+  for(int i = 0; i < totalCities; i++) {
+    graph->adjLists[i] = NULL;  // initialize all city nodes as null
+  }
+
+  for(int i = 0; i < totalCities; i++) {
+    for(int j = i + 1; j < totalCities; j++) {
+      double distance = calcCitiesEuclideanDistance(cities[i], cities[j]);
+      // complete graph -> every node has an edge to every other nodes
+      addBothWaysConnectionBetweenCitiesListGraph(graph, cities[i].id, cities[j].id, distance);
+    }
+  }
+
+  printf("\n--------------------testing adjacency list impl start--------------------\n");
+  printf("distance between cities 1 and 1: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 1, 1));
+  printf("distance between cities 1 and 2: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 1, 2));
+  printf("distance between cities 3 and 4: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 3, 4));
+  printf("distance between cities 4 and 4: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 4, 4));
+
+  editDistanceBetweenCitiesListGraph(graph, 3, 2, 10);
+  printf("distance between cities 3 and 2: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 3, 2));
+  printf("distance between cities 2 and 3: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 2, 3));
+
+  removeCityAndAllEdgesListGraph(graph, 1);
+  printf("distance between cities 1 and 2: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 1, 2));
+  printf("distance between cities 1 and 3: %.2f\n", getDistanceBetweenCitiesListGraph(graph, 1, 3));
+
+  printf("distance between cities 3 and 10 (city 10 doesn't exist): %.2f\n",
+         getDistanceBetweenCitiesListGraph(graph, 3, 10));
+  printf("--------------------testing adjacency list impl end --------------------\n\n");
+
+  freeEntireGraphList(graph);
+}
+// adjacency list end
 
 int main() {
   City cities[] = {{1, 24748.3333, 50840.0000},
@@ -264,10 +521,50 @@ int main() {
                    {4, 24900.0000, 50900.0000}};
   int totalCities = sizeof(cities) / sizeof(cities[0]);
 
-  // matrix
   matrixImplementation(cities, totalCities);
 
-  // adjacency list
+  adjacencyListImplementation(cities, totalCities);
+
+  printf("Want to see Big O of funcs in the end? yes 1, no 0\n");
+  int a = 0;
+  scanf("%d", &a);
+  if(a == 1) {
+    printf(
+        "Undirected and complete graph for cities, version with adjacency matrix and also adjacency list:\n\
+      \n\
+      Time and Space Complexity:\n\
+      \n\
+      v = vertices = nodes = cities\n\
+      e = edges = path between cities\n\
+      \n\
+      Matrix big O notation (worst case):\n\
+      - addCitiesEdgeMatrix:\n\
+        - time: O(v^2) we need to copy all the values to the new matrix\n\
+        - space: O(v^2) we realloc an entire new matrix\n\
+      - removeCityAndAllEdgesMatrix:\n\
+        - time: O(v^2) we need to copy all the values to the new matrix\n\
+        - space: O(v^2) we realloc an entire new matrix\n\
+      - getDistanceBetweenCitiesMatrix:\n\
+        - time: O(1) because we access by indexes directly\n\
+        - space: O(1) dont alloc any new space for this\n\
+      - editDistanceBetweenCitiesMatrix:\n\
+        - time: O(1) because we access by indexes directly\n\
+        - space: O(1) dont alloc any new space for this\n\
+      \n\
+      Adjacency list:\n\
+      - addNewCityWithAllEdgesListGraph:\n\
+        - time: O(v) loop v-1 cities to connect this city with others\n\
+        - space: O(v) because of the new v-1 edges (undirected graph connects the new city with all others)\n\
+      - removeCityAndAllEdgesListGraph:\n\
+        - time: O(v + e) we traverse vertices and their edges to remove connections with the deleted city\n\
+        - space: O(1) dont alloc any new space\n\
+      - getDistanceBetweenCitiesListGraph:\n\
+        - time: O(deg(v)) -> worst case O(v) in a dense graph, because we iterate all edges of the source vertex\n\
+        - space: O(1) dont alloc any new space for this\n\
+      - editDistanceBetweenCitiesListGraph:\n\
+        - time: O(deg(v)) -> worst case O(v) in a dense graph, because we iterate edges of both vertices\n\
+        - space: O(1) dont alloc any new space for this\n");
+  }
 
   return 0;
 }
