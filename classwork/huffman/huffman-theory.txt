@@ -1,0 +1,77 @@
+/*
+1 binary trees made only of one root containing: (symbol + its number of occurrences)
+2 minHeap of these binary trees roots -[(a;12), (b;15), (c;32)]
+3 merge the first two and the new root will be the sum of occurrences
+
+- left (a;12) <- 27 -> (b;15) right
+  4 return the tree result of this merge to the minHeap
+- [27, (c;32)]
+  -> \* repeat 3 and 4 until heap contain only one node
+  5 now use 0's for the left nodes and 1 for the right nodes in the resultant binary tree (I choose 0's for left, but you
+  can do whatever you want)
+
+#where is the greedy decision?
+
+- It is in merging the least frequent symbols first.
+- This guarantees that the most frequent symbols stay closer to the root of the tree. (shorter codes)
+
+-> END:
+
+- Now it works the same as chars, in which if you reach a leaf it means you have a valid symbol. Example: A = 00, B =
+  01, C = 1
+- result: Huffman’s algorithm puts the most recurrent symbols at the start of the binary tree, and the less recurrent
+  ones deeper.
+- it uses the probability of occurrence to create the representation;
+  - most occurrence = smaller representation
+  - least occurrence = bigger representation
+
+# For encoding performatically you can save the dictionary:
+
+A = 00, B = 01, C = 1
+
+# For decoding you need the tree.
+
+- tree can both decode or encode, but most performatic way to encode is with the table.
+
+@Cost for building the huffman's code tree: O(n \* log n)
+->n = number of symbols
+->heap height = log n (since is a binary tree)
+
+- 1 to add n chars to the heap -> n _ O(log n) = O(n _ log n)
+  - since I'm adding one by one, not fixing an existent structure
+- 2 to get two by two and merge until end: (it runs n-1 times)
+  - get two min items on minHeap: 2 \* O(log n)
+  - merge trees: O(1)
+  - insert merged tree on heap: O(log n)
+  - result: 2*O(log n) + O(1) + O(log n) = 3*O(log n) + O(1) = O(log n)
+  - repeat until clean the min heap: (n-1) times (n = amount of symbols)
+    - (n-1) _ O(log n) = O(n _ log n)
+
+@cost for encoding one symbol:
+
+- with the tree: O(tree height)
+- with the table: O(1)
+
+@decoding a symbol requires the huffman's tree that works the same as a trie (prefix tree)
+
+- we need to iterate over all the valid bits of the given code: O(code valid bits size)
+- Example - ABC (A = 00, B = 01, C = 1) -> 00011 - For storing we need to add padding bits (fill with 0's until reach 1 byte size) -> 8bits: 00011000 - We need to save the amount of valid bits when encoding, in this case, valid bits = 5 (this is required for
+  decoding) - And then we would decode iterating over our huffman's tree and find the required leafs containing the symbols.
+
+## OBS: it can be used for words too in texts, instead of having symbol=char we would have symbol=word
+
+- e.g: "hello", ocurrences=5...
+
+english:
+https://courses.cs.northwestern.edu/311/notes/huffman.pdf
+https://www.youtube.com/watch?v=B3y0RsVCyrw
+https://www.youtube.com/watch?v=co4_ahEDCho
+https://www.geeksforgeeks.org/dsa/huffman-coding-greedy-algo-3/
+portuguese:
+https://www.youtube.com/watch?v=sXY_V_HPfyA
+https://www.youtube.com/watch?v=JgEF_kkhLjQ
+https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/huffman.html
+https://www.ime.usp.br/~pf/analise_de_algoritmos/aulas/huffman.html
+
+
+*/
