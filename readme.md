@@ -5,48 +5,101 @@
 
 ## Table of contents:
 
-### Algorithm Complexity Analysis
-
-- [Algorithm Complexity Analysis PART I - Big O](./algorithm-complexity-analysis/part1-bigO.md)
-  - [Recursive Complexity](./algorithm-complexity-analysis/recursive-complexity)
-
-### Data Structures
-
-- [Dynamic Array MD](./dsa-in-c/dynamicArray.md)
-  - [Dynamic Array C](./dsa-in-c/dynamicArray.c)
-- [Stack MD](./dsa-in-c/stack.md)
-  - [Stack C](./dsa-in-c/stack.c)
-- [Queue MD](./dsa-in-c/queue.md)
-  - [Queue C](./dsa-in-c/queue.c)
-<!-- - [AVL-tree MD](./dsa-in-c/AVL-tree.md) -->
-  <!-- - [AVL-tree C](./dsa-in-c/AVL-tree.c) -->
-  <!-- - [Heap MD](./dsa-in-c/heap.md)
-  - [Heap C](./dsa-in-c/heap.c) -->
-
-### Algorithms
-
-- [Two Pointers MD](./dsa-in-c/twoPointers.md)
-  - [Two Pointers C](./dsa-in-c/twoPointers.c)
-- [Binary Search MD](./dsa-in-c/binarySearch.md)
-  - [Binary Search C](./dsa-in-c/binarySearch.c)
-  <!-- - [Sliding Window MD](./dsa-in-c/sliding-window.md)
-  - [Sliding Window C](./dsa-in-c/sliding-window.c) -->
-
-### C programming concepts
-
-- [2D Arrays and Pointers](./c-programming-concepts/2D-array-and-pointers.c)
-  - [Pointer Arithmetics](./c-programming-concepts/pointer-arithmetics.c)
-  - [Pointers to Functions](./c-programming-concepts/pointers-to-functions.c)
-
-### LeetCode Solutions
-
-- [110-balanced-binary-tree.c](./leetcode-solutions/110-balanced-binary-tree.c)
-- [155-min-stack.c](./leetcode-solutions/155-min-stack.c)
-- [167-two-sum-sorted-array.c](./leetcode-solutions/167-two-sum-sorted-array.c)
-- [20-valid-parentheses.c](./leetcode-solutions/20-valid-parentheses.c)
-- [225-stack-using-queues.c](./leetcode-solutions/225-stack-using-queues.c)
-- [232-queue-using-stacks.c](./leetcode-solutions/232-queue-using-stacks.c)
-- [232-queue-using-stacks.md](./leetcode-solutions/232-queue-using-stacks.md)
-- [334-reverse-string.c](./leetcode-solutions/334-reverse-string.c)
-- [704-binary-search.c](./leetcode-solutions/704-binary-search.c)
-- [739-daily-temperatures.c](./leetcode-solutions/739-daily-temperatures.c)
+- [debugging-gdb-lldb.md](./debugging-gdb-lldb.md)
+- [readme.md](./readme.md)
+- algorithm-complexity-analysis
+  - [part1-bigO.md](./algorithm-complexity-analysis/part1-bigO.md)
+  - recursive-complexity
+    - [fib.c](./algorithm-complexity-analysis/recursive-complexity/fib.c)
+    - [fib.js](./algorithm-complexity-analysis/recursive-complexity/fib.js)
+- basics_cpp
+  - [main.cpp](./basics_cpp/main.cpp)
+  - [readme.md](./basics_cpp/readme.md)
+- c-programming-concepts
+  - [2D-array-and-pointers.c](./c-programming-concepts/2D-array-and-pointers.c)
+  - [dangling-and-wild-pointers.c](./c-programming-concepts/dangling-and-wild-pointers.c)
+  - [mutable-vs-immutable.c](./c-programming-concepts/mutable-vs-immutable.c)
+  - [pointer-arithmetics.c](./c-programming-concepts/pointer-arithmetics.c)
+  - [pointers-to-functions.c](./c-programming-concepts/pointers-to-functions.c)
+- classwork
+  - 1382
+    - [1st-version.c](./classwork/1382/1st-version.c)
+    - [last-version.c](./classwork/1382/last-version.c)
+    - [readme.md](./classwork/1382/readme.md)
+  - 1405
+    - [1st-version.c](./classwork/1405/1st-version.c)
+    - [last-version.c](./classwork/1405/last-version.c)
+    - [readme.md](./classwork/1405/readme.md)
+  - 1763
+    - [1st-version.c](./classwork/1763/1st-version.c)
+    - [js-version-ignore.js](./classwork/1763/js-version-ignore.js)
+    - [last-version.c](./classwork/1763/last-version.c)
+    - [readme.md](./classwork/1763/readme.md)
+  - 23
+    - [1st-version.c](./classwork/23/1st-version.c)
+    - [last-version.c](./classwork/23/last-version.c)
+    - [readme.md](./classwork/23/readme.md)
+  - agenda-buffer
+    - [agenda-buffer.c](./classwork/agenda-buffer/agenda-buffer.c)
+    - [readme.md](./classwork/agenda-buffer/readme.md)
+  - cache-simulator
+    - [README.md](./classwork/cache-simulator/README.md)
+    - [cache-simulator.js](./classwork/cache-simulator/cache-simulator.js)
+  - crosswords
+    - [crosswords.c](./classwork/crosswords/crosswords.c)
+    - [readme.md](./classwork/crosswords/readme.md)
+  - dbms
+    - [clean-db.c](./classwork/dbms/clean-db.c)
+    - [dbms-btree.c](./classwork/dbms/dbms-btree.c)
+  - hashtable-oplexicon
+    - [hashtable-oplexicon.c](./classwork/hashtable-oplexicon/hashtable-oplexicon.c)
+    - [readme.md](./classwork/hashtable-oplexicon/readme.md)
+  - huffman
+    - [huffman.c](./classwork/huffman/huffman.c)
+  - trie-oplexicon
+    - [readme.md](./classwork/trie-oplexicon/readme.md)
+    - [trie-oplexicon.c](./classwork/trie-oplexicon/trie-oplexicon.c)
+  - trie-text-9-keys
+    - [readme.md](./classwork/trie-text-9-keys/readme.md)
+    - [trie-text-9-keys.c](./classwork/trie-text-9-keys/trie-text-9-keys.c)
+  - tsp-graphs
+    - [tsp-graphs.c](./classwork/tsp-graphs/tsp-graphs.c)
+- data-structures-in-c
+  - [dynamicArray.c](./data-structures-in-c/dynamicArray.c)
+  - [dynamicArray.md](./data-structures-in-c/dynamicArray.md)
+- dsa-in-c
+  - [binarySearch.c](./dsa-in-c/binarySearch.c)
+  - [binarySearch.md](./dsa-in-c/binarySearch.md)
+  - [binarySearchTree.c](./dsa-in-c/binarySearchTree.c)
+  - [dynamicArray.c](./dsa-in-c/dynamicArray.c)
+  - [dynamicArray.md](./dsa-in-c/dynamicArray.md)
+  - [graphs.c](./dsa-in-c/graphs.c)
+  - [queue.c](./dsa-in-c/queue.c)
+  - [queue.md](./dsa-in-c/queue.md)
+  - [stack.c](./dsa-in-c/stack.c)
+  - [stack.md](./dsa-in-c/stack.md)
+  - [trie.cpp](./dsa-in-c/trie.cpp)
+  - [twoPointers.c](./dsa-in-c/twoPointers.c)
+  - [twoPointers.md](./dsa-in-c/twoPointers.md)
+- dsa-in-js
+  - [bfs.js](./dsa-in-js/bfs.js)
+  - [binary-search-tree.js](./dsa-in-js/binary-search-tree.js)
+  - [binary-tree.js](./dsa-in-js/binary-tree.js)
+  - [dfs.js](./dsa-in-js/dfs.js)
+  - [linked-list.js](./dsa-in-js/linked-list.js)
+  - [queue.js](./dsa-in-js/queue.js)
+  - [stack.js](./dsa-in-js/stack.js)
+- leetcode-solutions
+  - [104-maximum-depth-of-a-binary-tree.js](./leetcode-solutions/104-maximum-depth-of-a-binary-tree.js)
+  - [110-balanced-binary-tree.c](./leetcode-solutions/110-balanced-binary-tree.c)
+  - [155-min-stack.c](./leetcode-solutions/155-min-stack.c)
+  - [167-two-sum-sorted-array.c](./leetcode-solutions/167-two-sum-sorted-array.c)
+  - [20-valid-parentheses.c](./leetcode-solutions/20-valid-parentheses.c)
+  - [225-stack-using-queues.c](./leetcode-solutions/225-stack-using-queues.c)
+  - [232-queue-using-stacks.c](./leetcode-solutions/232-queue-using-stacks.c)
+  - [232-queue-using-stacks.md](./leetcode-solutions/232-queue-using-stacks.md)
+  - [334-reverse-string.c](./leetcode-solutions/334-reverse-string.c)
+  - [704-binary-search.c](./leetcode-solutions/704-binary-search.c)
+  - [739-daily-temperatures.c](./leetcode-solutions/739-daily-temperatures.c)
+- valgrind-test
+  - [valgrind-test.c](./valgrind-test/valgrind-test.c)
