@@ -1,4 +1,4 @@
-import { FilePathPrefixTrie } from './dsa-in-js/filepath-prefix-trie.js'
+import { FilePathPrefixTree } from './dsa-in-js/filepath-prefix-trie.js'
 import { spawn } from 'child_process';
 import fs from 'fs';
 
@@ -6,12 +6,12 @@ import fs from 'fs';
 const cmd = 'git log --name-only --pretty=format: | grep -E "\\.md$|\\.c$|\\.cpp$|\\.js$" | sort -u';
 const gitLog = spawn(cmd, { shell: true });
 
-const trieRoot = new FilePathPrefixTrie('\0', '.');
+const trieRoot = new FilePathPrefixTree('\0', '.');
 
 gitLog.stdout.on('data', (data) => {
   const filepaths = data.toString().split('\n').filter(Boolean);
   for (let filepath of filepaths) {
-    FilePathPrefixTrie.insertPath(trieRoot, filepath);
+    FilePathPrefixTree.insertPath(trieRoot, filepath);
   }
 
   const lines = [];
@@ -27,7 +27,7 @@ gitLog.stdout.on('data', (data) => {
       lines.push(`${indentTabs}- ${path}`);
     }
   };
-  FilePathPrefixTrie.traverse({ currNode: trieRoot, cbToProcessPathString: printPath, currLevel: 0 });
+  FilePathPrefixTree.traverse({ currNode: trieRoot, cbToProcessPathString: printPath, currLevel: 0 });
 
   const md = [
     '# DSA Studies',

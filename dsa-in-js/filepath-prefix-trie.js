@@ -1,4 +1,5 @@
-export class FilePathPrefixTrie {
+// prefix tree = trie
+export class FilePathPrefixTree {
   constructor(path, fullPath, files) {
     if (!path) { throw new Error('required path') }
     this.path = path;
@@ -22,7 +23,7 @@ export class FilePathPrefixTrie {
       let nextNode = currNode.foldersMap.get(pathPart);
 
       if (!nextNode) {
-        nextNode = new FilePathPrefixTrie(pathPart, fullPath);
+        nextNode = new FilePathPrefixTree(pathPart, fullPath);
         currNode.foldersMap.set(pathPart, nextNode);
       }
 
@@ -42,7 +43,7 @@ export class FilePathPrefixTrie {
     }
 
     for (const folder of currNode.foldersMap.values()) {
-      FilePathPrefixTrie.traverse({ currNode: folder, cbToProcessPathString, currLevel: currLevel + 1 });
+      FilePathPrefixTree.traverse({ currNode: folder, cbToProcessPathString, currLevel: currLevel + 1 });
     }
   }
 }
@@ -55,8 +56,8 @@ export class FilePathPrefixTrie {
 //   'users/joao/files/mypdf.pdf'
 // ]
 
-// const trieRoot = new FilePathPrefixTrie('\0', './'); // empty root node
-// filePaths.forEach(filePath => FilePathPrefixTrie.insertPath(trieRoot, filePath))
+// const trieRoot = new FilePathPrefixTree('\0', './'); // empty root node
+// filePaths.forEach(filePath => FilePathPrefixTree.insertPath(trieRoot, filePath))
 
 // const printPath = ({ path, currLevel }) => {
 //   let blankSpacesForLevel = '';
@@ -65,7 +66,7 @@ export class FilePathPrefixTrie {
 //   }
 //   console.log(`${blankSpacesForLevel}|__${path}`);
 // }
-// FilePathPrefixTrie.traverse({ currNode: trieRoot, cbToProcessPathString: printPath, currLevel: 0 });
+// FilePathPrefixTree.traverse({ currNode: trieRoot, cbToProcessPathString: printPath, currLevel: 0 });
 
 // ➜  dsa-in-js git:(main) ✗ node filepath-preffix-trie.js
 // |__users
