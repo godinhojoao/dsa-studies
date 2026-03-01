@@ -6,6 +6,7 @@
 ## Table of contents:
 
 - [debugging-gdb-lldb.md](./debugging-gdb-lldb.md)
+- [generate-readme.js](./generate-readme.js)
 - [readme.md](./readme.md)
 - algorithm-complexity-analysis
   - [part1-bigO.md](./algorithm-complexity-analysis/part1-bigO.md)
@@ -86,6 +87,7 @@
   - [binary-search-tree.js](./dsa-in-js/binary-search-tree.js)
   - [binary-tree.js](./dsa-in-js/binary-tree.js)
   - [dfs.js](./dsa-in-js/dfs.js)
+  - [filepath-prefix-trie.js](./dsa-in-js/filepath-prefix-trie.js)
   - [linked-list.js](./dsa-in-js/linked-list.js)
   - [queue.js](./dsa-in-js/queue.js)
   - [stack.js](./dsa-in-js/stack.js)
