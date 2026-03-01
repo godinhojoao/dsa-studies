@@ -1,4 +1,4 @@
-import { TreeNode } from './binary-tree.js'
+import { BinaryTreeNode } from './binary-tree.js'
 
 // time O(nodes), space O(width of tree)
 const queue = [] // FIFO
@@ -22,6 +22,6 @@ function bfs(currNode) {
   }
 }
 
-const root = TreeNode.treeFromArray([1, 20, 32, 2, 30, 40]);
+const root = BinaryTreeNode.treeFromArray([1, 20, 32, 2, 30, 40]);
 console.log('root', root)
 bfs(root) // 1,20,32,2,30,40

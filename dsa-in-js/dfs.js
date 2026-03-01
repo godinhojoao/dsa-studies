@@ -1,4 +1,4 @@
-import { TreeNode } from './../dsa-in-js/binary-tree.js'
+import { BinaryTreeNode } from './../dsa-in-js/binary-tree.js'
 
 // time O(nodes), space O(height tree) -> because of stack
 function recursiveDfs(currNode) {
@@ -29,7 +29,7 @@ function iterativeDfs(currNode) {
   }
 }
 
-const root = TreeNode.treeFromArray([3, 9, 20, null, null, 15, 7]);
+const root = BinaryTreeNode.treeFromArray([3, 9, 20, null, null, 15, 7]);
 console.log('root', root)
 console.log('recursive:')
 recursiveDfs(root) // 3, 9, 20, 15, 7

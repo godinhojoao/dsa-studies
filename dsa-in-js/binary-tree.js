@@ -1,4 +1,4 @@
-export class TreeNode {
+export class BinaryTreeNode {
   constructor(val, left, right) {
     this.val = val ?? 0; // if null or undefined use 0
     this.left = left ?? null;
@@ -7,7 +7,7 @@ export class TreeNode {
 
   static treeFromArray(items) {
     if (!items.length || items[0] == null) return null;
-    const root = new TreeNode(items[0])
+    const root = new BinaryTreeNode(items[0])
     const nodes = [root];
 
     for (let i = 0; i < items.length; i++) {
@@ -15,12 +15,12 @@ export class TreeNode {
       const rightChildIdx = (2 * i) + 2;
 
       if (items[leftChildIdx] != null) {
-        nodes[i].left = new TreeNode(items[leftChildIdx]);
+        nodes[i].left = new BinaryTreeNode(items[leftChildIdx]);
         nodes[leftChildIdx] = nodes[i].left;
       }
 
       if (items[rightChildIdx] != null) {
-        nodes[i].right = new TreeNode(items[rightChildIdx]);
+        nodes[i].right = new BinaryTreeNode(items[rightChildIdx]);
         nodes[rightChildIdx] = nodes[i].right;
       }
     }
@@ -28,6 +28,6 @@ export class TreeNode {
     return root;
   }
 }
-// const root = TreeNode.treeFromArray([3, 9, 20, null, null, 15, 7]);
+// const root = BinaryTreeNode.treeFromArray([3, 9, 20, null, null, 15, 7]);
 // console.log('root', root)
 
