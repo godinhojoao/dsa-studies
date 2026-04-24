@@ -34,8 +34,11 @@ Possible improvements:
 sizes (shrink and grow)
 
 Possible changes and its trade-offs:
-- Using a BST with the elements instead of a linked list would get faster worst case (but slower avg case):
-  - insert, find and remove from O(k) to O(log k)
+- Using a balanced BST instead of a hashtable would get faster worst case (but slower avg case):
+  - worst case: insert, find, remove
+  -- from O(n) hashtable to O(log n) balanced BST
+  - avg case: insert, find, remove
+  -- from O(1) hashtable to O(log n) balanced BST
 */
 
 typedef struct SetNode {
