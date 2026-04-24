@@ -8,12 +8,13 @@
 constexpr int M = 3;  // better in c++ type safety
 
 // "A container is a holder object that stores a collection of other objects"
-template <typename Container>  // using a template to accept a generic type (name container is for convenience not a required name)
+template <typename Container>  // using a template to accept a generic type (name container is for convenience not a
+                               // required name)
 
-// Container a -> copy
-// Container& a -> original, writable ---> in C we would receive a pointer to modify the original, for example: int a*
-// const Container& a -> original and read-only
-void printArrayUtility(const std::string prefix, const Container& a, size_t size) {
+                               // Container a -> copy
+                               // Container& a -> original, writable ---> in C we would receive a pointer to modify the
+                               // original, for example: int a* const Container& a -> original and read-only
+                               void printArrayUtility(const std::string prefix, const Container& a, size_t size) {
   if(!prefix.empty()) {
     std::cout << prefix + ": ";
   }
@@ -49,10 +50,9 @@ void demoInAndOut() {
   std::cin >> b;
   std::cout << "This is your string (until first space ->cin): " << b << "\n\n";
 
-  // --> If you write "joao test", the words after the space read by std::cin will stay in the buffer and may mess up future inputs.
-  // solution for this: clear the entire buffer after a cin
-  // std::cin.ignore(length, delimiter)
-  // or always use getline instead of cin
+  // --> If you write "joao test", the words after the space read by std::cin will stay in the buffer and may mess up
+  // future inputs. solution for this: clear the entire buffer after a cin std::cin.ignore(length, delimiter) or always
+  // use getline instead of cin
 
   // streamsize is a type and we use the std::numeric_limits to get its max value
   // if it doesn't find the delimiter \n in this case, it will keep holding until you add it to the buffer
@@ -85,12 +85,14 @@ void demoClasses() {
       y = yArg;
     }
 
-    void move(int dx, int dy) {
+    void move(int dx, int dy) {  // non const method
       x += dx;
       y += dy;
     }
 
-    int getXPrivate() const { return xPrivate; }
+    int getXPrivate() const {
+      return xPrivate;
+    }  // const method
 
     // public getter for private member
     // this second const is to say "read only method"
@@ -101,8 +103,8 @@ void demoClasses() {
     // p1.getXPrivate();  // ok if this is a const method
   };
 
-  Point p1(1, 2);  // constructor called
-  p1.move(3, 4);  // call method
+  Point p1(1, 2);                                            // constructor called
+  p1.move(3, 4);                                             // call method
   std::cout << "public property from p1: " << p1.x << "\n";  // access public member
   std::cout << "private property from p1: " << p1.getXPrivate() << "\n";
 
@@ -125,16 +127,46 @@ void demoClasses() {
 
    public:
     CustomEx(const std::string& s) : msg(s) {}
-    // what() is a virtual method from the base class std::exception and we are overriding it with our implementation on CustomEx
+    // what() is a virtual method from the base class std::exception and we are overriding it with our implementation on
+    // CustomEx
     const char* what() const noexcept override {
       // noexcept is this method saying to the compiler it will not throw exceptions at runtime
       // if we add this --> throw std::runtime_error("oops");
-      // compiler will return a warning -> main.cpp:120:7: warning: 'what' has a non-throwing exception specification but can still throw [-Wexceptions]
+      // compiler will return a warning -> main.cpp:120:7: warning: 'what' has a non-throwing exception specification
+      // but can still throw [-Wexceptions]
       return msg.c_str();
     }
   };
 
-  // arr -> same thing as in c
+  class Animal {
+   public:
+    float height;
+
+    Animal(float height) {
+      this->height = height;
+    }
+
+    std::string sound() {
+      return "generic animal sound";
+    }
+  };
+
+  class Cat : public Animal {
+   public:
+    float weight;
+    Cat(float w) : Animal(0.3), weight(w) {}
+
+    std::string sound() {
+      return "meow";
+    }
+
+    void showInfos() {
+      std::cout << "cat.showInfos(): " << "weight: " << this->weight << " height: " << this->height << "\n";
+    }
+  };
+
+  Cat mycat(5.3);
+  mycat.showInfos();
 }
 
 void demoHandlingExceptions() {
@@ -143,7 +175,9 @@ void demoHandlingExceptions() {
 
    public:
     MyCustomExceptionClass(const std::string& s) : msg(s) {}
-    const char* what() const noexcept override { return msg.c_str(); }
+    const char* what() const noexcept override {
+      return msg.c_str();
+    }
   };
 
   // making code safe with try/catch to handle exceptions
@@ -151,8 +185,8 @@ void demoHandlingExceptions() {
     int num;
     std::cout << "Give me a number (-1 invalid arg, 0 logic error): ";
 
-    while(!(std::cin >> num)) {  // keep looping while input fails
-      std::cin.clear();  // clear error state
+    while(!(std::cin >> num)) {     // keep looping while input fails
+      std::cin.clear();             // clear error state
       std::cin.ignore(1000, '\n');  // discard invalid input
       std::cout << "Invalid input. Enter a number: ";
     }
@@ -164,14 +198,15 @@ void demoHandlingExceptions() {
     if(num == 0) {
       throw std::logic_error("Division by zero is a logic error");
       // without try catch it would break our system with uncaught exception:
-      //libc++abi: terminating due to uncaught exception of type std::logic_error: Division by zero is a logic error
+      // libc++abi: terminating due to uncaught exception of type std::logic_error: Division by zero is a logic error
       // [1]    61762 abort      ./main
     }
   } catch(const std::logic_error& ex) {
     std::cerr << "Logic error: " << ex.what() << "\n";
   } catch(const std::exception& ex) {
     std::cerr << "some type of exception msg:: " << ex.what() << "\n";
-    std::cerr << "Exception type: " << typeid(ex).name() << "\n";  // typeid describes the type of an expression or typename
+    std::cerr << "Exception type: " << typeid(ex).name()
+              << "\n";  // typeid describes the type of an expression or typename
   }
 }
 
@@ -190,7 +225,8 @@ void demoStdLibContainers() {
   // continguous same as c arr on stack and can reallocate on growth
   // push_back is not always O(1); it becomes O(n) when the vector reallocates upon reaching its capacity
   // Don’t store pointers to vectors; resizing can invalidate them.
-  // ->multiple built-in functions like resize, push_back, pop_back, empty (returns true if is empty), shrink_to_fit, swap(another vec), at
+  // ->multiple built-in functions like resize, push_back, pop_back, empty (returns true if is empty), shrink_to_fit,
+  // swap(another vec), at
   // --> vec[4] is unsafe if out of bounds because it does NOT perform bounds checking
   // --> vec.at(4) is safe: throws std::out_of_range if the index is out of bounds
   std::vector<int> numVec = {1, 2, 3, 4};
@@ -206,10 +242,7 @@ void demoMemManagement() {}
 // func template accepting only int and double
 template <typename T>
 T maxVal(T a) {
-  static_assert(
-      std::is_same<T, int>::value ||
-          std::is_same<T, double>::value,
-      "Only int or double allowed");
+  static_assert(std::is_same<T, int>::value || std::is_same<T, double>::value, "Only int or double allowed");
   return a;
 }
 
@@ -231,7 +264,9 @@ class Box<int> {
  public:
   int value;
   Box(int v) : value(v) {}
-  void show() { std::cout << "int: " << value << "\n"; }
+  void show() {
+    std::cout << "int: " << value << "\n";
+  }
 
   void customMethodForIntBoxOnly() {
     std::cout << "customMethodForIntBoxOnly\n";
@@ -252,10 +287,12 @@ void demoTemplates() {
   a.customMethodForIntBoxOnly();
   Box<double> b(2.5);
   b.show();
-  // b.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member "customMethodForIntBoxOnly"C/C++(135)
+  // b.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member
+  // "customMethodForIntBoxOnly"C/C++(135)
   Box<std::string> c("testing");
   c.show();
-  // c.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member "customMethodForIntBoxOnly"C/C++(135)
+  // c.customMethodForIntBoxOnly(); // compile time: class "Box<double>" has no member
+  // "customMethodForIntBoxOnly"C/C++(135)
 }
 
 // demoNamespaces:
@@ -275,7 +312,9 @@ namespace inner {
 int configtest = 100;
 const double pi = 3.14159;
 
-void hello() { std::cout << "Hello\n"; }
+void hello() {
+  std::cout << "Hello\n";
+}
 }  // namespace inner
 }  // namespace outer
 
@@ -290,7 +329,9 @@ class Test {
  public:
   int x;
   Test(int a) : x(a) {}
-  void show() { std::cout << "testing show x: " << x << "\n"; }
+  void show() {
+    std::cout << "testing show x: " << x << "\n";
+  }
 };
 }  // namespace
 
@@ -351,22 +392,38 @@ void demoFileStreams() {
 
   std::ifstream inFile;
   inFile.open("widecharfile.txt");
-  if(!inFile) throw std::runtime_error("Cannot open input.txt");
+  if(!inFile)
+    throw std::runtime_error("Cannot open input.txt");
   std::cout << "inFile.is_open: " << (inFile.is_open() ? "yes" : "not") << "\n";
 
   std::ofstream outFile("output.txt");  // another way to open file
-  if(!outFile) throw std::runtime_error("Cannot open output.txt");
+  if(!outFile)
+    throw std::runtime_error("Cannot open output.txt");
   std::cout << "outFile.is_open: " << (outFile.is_open() ? "yes" : "not") << "\n";
 
   // 1. reading line by line and processing without holding entire file content
   std::string line;
   while(std::getline(inFile, line)) {
     std::cout << "line: " << line << "\n";
-    outFile.write(line.c_str(), line.size());  //std::string c_str method returns a raw char pointer (char*) with null terminator
+    outFile.write(line.c_str(),
+                  line.size());  // std::string c_str method returns a raw char pointer (char*) with null terminator
     outFile.put('\n');
   }
   inFile.close();
   outFile.close();
+}
+
+void demoEnumeration() {
+  enum Role { STANDARD, ADMIN, OTHER = 30 };
+
+  enum Role test = ADMIN;
+  std::cout << "STANDARD: " << STANDARD << "\n";
+  std::cout << "ADMIN: " << test << "\n";
+  std::cout << "OTHER: " << OTHER << "\n";
+
+  if(ADMIN == 1) {
+    std::cout << "if ADMIN == 1 is true\n";
+  }
 }
 
 int main() {
@@ -374,7 +431,7 @@ int main() {
 
   // demoInAndOut();
 
-  // demoClasses();
+  demoClasses();
 
   // demoHandlingExceptions();
 
@@ -382,13 +439,16 @@ int main() {
 
   // demoStdLibAlgorithms();  //not done add more std lib stuff
 
-  // demoMemManagement();  // not done -> compare heap, std lib, stack, etc.. Dynamic memory, new, delete, etc.. new[] delete[], smart pointers std::unique_ptr, std::shared_ptr
-  // talk about RAII inside it
+  // demoMemManagement();  // not done -> compare heap, std lib, stack, etc.. Dynamic memory, new, delete, etc.. new[]
+  // delete[], smart pointers std::unique_ptr, std::shared_ptr talk about RAII inside it
 
   // demoTemplates();
 
   // demoNamespaces();
 
   // demoFileStreams();
+
+  // demoEnumeration();
+
   return 0;
 }

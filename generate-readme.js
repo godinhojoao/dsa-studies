@@ -2,8 +2,8 @@ import { FilePathPrefixTree } from './dsa-in-js/filepath-prefix-trie.js'
 import { spawn } from 'child_process';
 import fs from 'fs';
 
-// getting all commited files with these extensions
-const cmd = 'git log --name-only --pretty=format: | grep -E "\\.md$|\\.c$|\\.cpp$|\\.js$" | sort -u';
+// getting only current tracked files - after git add
+const cmd = "git ls-files | grep -E '\\.md$|\\.c$|\\.cpp$|\\.js$' | sort -u";
 const gitLog = spawn(cmd, { shell: true });
 
 const trieRoot = new FilePathPrefixTree('\0', '.');

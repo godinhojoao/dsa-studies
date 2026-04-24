@@ -65,9 +65,6 @@
     - [trie-text-9-keys.c](./classwork/trie-text-9-keys/trie-text-9-keys.c)
   - tsp-graphs
     - [tsp-graphs.c](./classwork/tsp-graphs/tsp-graphs.c)
-- data-structures-in-c
-  - [dynamicArray.c](./data-structures-in-c/dynamicArray.c)
-  - [dynamicArray.md](./data-structures-in-c/dynamicArray.md)
 - dsa-in-c
   - [binarySearch.c](./dsa-in-c/binarySearch.c)
   - [binarySearch.md](./dsa-in-c/binarySearch.md)
@@ -86,7 +83,9 @@
   - [bfs.js](./dsa-in-js/bfs.js)
   - [binary-search-tree.js](./dsa-in-js/binary-search-tree.js)
   - [binary-tree.js](./dsa-in-js/binary-tree.js)
+  - [deque.js](./dsa-in-js/deque.js)
   - [dfs.js](./dsa-in-js/dfs.js)
+  - [doubly-linked-list.js](./dsa-in-js/doubly-linked-list.js)
   - [filepath-prefix-trie.js](./dsa-in-js/filepath-prefix-trie.js)
   - [linked-list.js](./dsa-in-js/linked-list.js)
   - [queue.js](./dsa-in-js/queue.js)

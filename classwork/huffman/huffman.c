@@ -185,8 +185,6 @@ void buildCodesTable(Node* currNode, char codesTable[SYMBOLS_AMOUNT][60], char c
   }
 }
 
-void writeSequenceIntoFile(FILE* writeFilePtr, char* currSequence, int* currWrittenBitsAmount) {}
-
 void freeHuffmanTree(Node* currNode) {
   if(currNode == NULL) {
     return;
