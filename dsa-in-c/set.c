@@ -39,6 +39,10 @@ Possible changes and its trade-offs:
   -- from O(n) hashtable to O(log n) balanced BST
   - avg case: insert, find, remove
   -- from O(1) hashtable to O(log n) balanced BST
+
+- A hashtable is generally better for unordered sets, because it provides constant-time average performance and does not maintain order.
+- A balanced BST is preferable only when worst-case guarantees or sorted order are more important than average performance.
+--> A set is an unordered data structure, so using a hashtable is preferable.
 */
 
 typedef struct SetNode {
