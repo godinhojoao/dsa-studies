@@ -121,13 +121,28 @@ console.log("permuteUnique count:", permuteUnique(permuteUniqueArray));
 
 // not yet
 // 4) pick p items from k where order does not matter, just the selection, formula: k!/(p!*(k-p)!)
-function combinationsWithoutRepetition() {
+function combinationsWithoutRepetition(items, path, pathLimitSize, start, count) {
+  if (path.length == pathLimitSize) {
+    console.log(path);
+    return count + 1;
+  }
 
+  for (let i = start; i < items.length; i++) {
+    path.push(items[i]);
+    count = combinationsWithoutRepetition(items, path, pathLimitSize, i + 1, count);
+    path.pop();
+    // 1st 0 R-> 2nd 01 R-> 3rd 012 (base case) Back-> 2nd 01 R-> 4th 013 (base case) Back-> 2nd 01 (iterated all at this lvl already) Back ->
+    // 1st 0 R-> 5th 02 R-> 6th 023 (base case) Back-> ...
+    // NOTICE: 012 = 021, using i = start and always sending to recursion(start=i+1) ensures that
+    // after any i we will never reuse it to build a similar path containing same positions used before.
+  }
+  return count;
 }
-// ....
-const combinationsWithoutRepetitionArray = [1, 2, 3]
-// console.log('\ncombinationsWithoutRepetitionArray', combinationsWithoutRepetitionArray)
-// console.log("combinationsWithoutRepetition count: ", combinationsWithoutRepetition(combinationsWithoutRepetitionArray, [], 0, 0));
+// pick 3 items from 4 possible values => n = 4, p = 3 res = 4*3!/3! = 4 different combinations
+const combinationsWithoutRepetitionArray = [1, 2, 3, 4]
+const pick = 3;
+console.log('\ncombinationsWithoutRepetitionArray', combinationsWithoutRepetitionArray)
+console.log("combinationsWithoutRepetition count: ", combinationsWithoutRepetition(combinationsWithoutRepetitionArray, [], pick, 0, 0));
 
 // ---------------------------------------------------------------
 // For the problems, you don't have to memorize names or formulas, just understand the logic and the multiplication principle
