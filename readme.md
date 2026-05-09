@@ -90,9 +90,13 @@
   - [dfs.js](./dsa-in-js/dfs.js)
   - [doubly-linked-list.js](./dsa-in-js/doubly-linked-list.js)
   - [filepath-prefix-trie.js](./dsa-in-js/filepath-prefix-trie.js)
+  - [heap1-binary-heap.js](./dsa-in-js/heap1-binary-heap.js)
+  - [heap2-build-heap-in-place.js](./dsa-in-js/heap2-build-heap-in-place.js)
+  - [heap3-heapsort.js](./dsa-in-js/heap3-heapsort.js)
   - [linked-list.js](./dsa-in-js/linked-list.js)
   - [queue.js](./dsa-in-js/queue.js)
   - [stack.js](./dsa-in-js/stack.js)
+  - [tspMetricBacktrack.js](./dsa-in-js/tspMetricBacktrack.js)
 - leetcode-solutions
   - [104-maximum-depth-of-a-binary-tree.js](./leetcode-solutions/104-maximum-depth-of-a-binary-tree.js)
   - [110-balanced-binary-tree.c](./leetcode-solutions/110-balanced-binary-tree.c)
