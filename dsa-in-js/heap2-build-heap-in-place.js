@@ -18,25 +18,30 @@ function swap(items, addedIndex, parentIndex) {
   items[parentIndex] = temp;
 }
 
-function heapifyDown({ currItemPosition, items }) {
-  let mostPriorityItemIndex = currItemPosition;
-  const leftChildIndex = 2 * currItemPosition + 1;
-  const rightChildIndex = 2 * currItemPosition + 2;
+// time: O(log n), space O(1)
+function iterativeHeapifyDown({ currItemPosition, items }) {
+  let current = currItemPosition;
 
-  const leftChildExists = leftChildIndex < items.length;
-  if (leftChildExists && items[leftChildIndex] > items[mostPriorityItemIndex]) {
-    mostPriorityItemIndex = leftChildIndex;
-  }
+  while (true) {
+    let mostPriorityItemIndex = current;
+    const leftChildIndex = 2 * current + 1;
+    const rightChildIndex = 2 * current + 2;
 
-  const rightChildExists = rightChildIndex < items.length;
-  if (rightChildExists && items[rightChildIndex] > items[mostPriorityItemIndex]) {
-    mostPriorityItemIndex = rightChildIndex;
-  }
+    const leftChildExists = leftChildIndex < items.length;
+    if (leftChildExists && items[leftChildIndex] > items[mostPriorityItemIndex]) {
+      mostPriorityItemIndex = leftChildIndex;
+    }
 
-  // if parent already has the highest priority, do nothing
-  if (mostPriorityItemIndex != currItemPosition) {
-    swap(items, currItemPosition, mostPriorityItemIndex);
-    heapifyDown({ items, currItemPosition: mostPriorityItemIndex });
+    const rightChildExists = rightChildIndex < items.length;
+    if (rightChildExists && items[rightChildIndex] > items[mostPriorityItemIndex]) {
+      mostPriorityItemIndex = rightChildIndex;
+    }
+
+    // if already correct, stop
+    if (mostPriorityItemIndex === current) break;
+
+    swap(items, current, mostPriorityItemIndex);
+    current = mostPriorityItemIndex;
   }
 }
 
@@ -49,7 +54,7 @@ function pop(items) {
   items.pop(); // remove last item from array
 
   if (currLength > 1) {
-    heapifyDown({ items, currItemPosition: 0 }); // fix top down
+    iterativeHeapifyDown({ items, currItemPosition: 0 }); // fix top down
   }
 
   return itemToReturn;
@@ -59,7 +64,7 @@ function pop(items) {
 function buildHeapInPlace(arr) {
   const arrSize = arr.length;
   for (let i = Math.floor(arrSize / 2) - 1; i >= 0; i--) {
-    heapifyDown({ items: arr, currItemPosition: i });
+    iterativeHeapifyDown({ items: arr, currItemPosition: i });
   }
 }
 
@@ -69,7 +74,7 @@ console.log('heap', arr)
 
 let i = 0;
 while (arr.length) {
-  console.log(`${i+1} - pop(arr): ${pop(arr)}`)
+  console.log(`${i + 1} - pop(arr): ${pop(arr)}`)
   ++i;
 }
 

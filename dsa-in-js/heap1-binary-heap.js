@@ -25,6 +25,7 @@ class BinaryHeap {
     this.#items[parentIndex] = temp;
   }
 
+  // time: O(log n), space O(log n) -> recursion, iterative is O(1) space
   #heapifyUp({ insertedItemCurrIndex }) {
     const parentIndex = Math.floor((insertedItemCurrIndex - 1) / 2);
     if (parentIndex < 0 || insertedItemCurrIndex == parentIndex) {
@@ -39,6 +40,7 @@ class BinaryHeap {
     }
   }
 
+  // time: O(log n), space O(log n) -> recursion, iterative is O(1) space
   #heapifyDown({ currItemPosition }) {
     let mostPriorityItemIndex = currItemPosition;
     const leftChildIndex = 2 * currItemPosition + 1;

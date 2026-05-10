@@ -4,32 +4,37 @@ function swap(items, addedIndex, parentIndex) {
   items[parentIndex] = temp;
 }
 
-function heapifyDown({ currItemPosition, items, lastHeapIndex }) {
-  let mostPriorityItemIndex = currItemPosition;
-  const leftChildIndex = 2 * currItemPosition + 1;
-  const rightChildIndex = 2 * currItemPosition + 2;
+// time: O(log n), space O(1)
+function iterativeHeapifyDown({ currItemPosition, items, lastHeapIndex }) {
+  let current = currItemPosition;
 
-  const leftChildExists = leftChildIndex < items.length && leftChildIndex < lastHeapIndex;
-  if (leftChildExists && items[leftChildIndex] > items[mostPriorityItemIndex]) {
-    mostPriorityItemIndex = leftChildIndex;
-  }
+  while (true) {
+    let mostPriorityItemIndex = current;
+    const leftChildIndex = 2 * current + 1;
+    const rightChildIndex = 2 * current + 2;
 
-  const rightChildExists = rightChildIndex < items.length && rightChildIndex < lastHeapIndex;
-  if (rightChildExists && items[rightChildIndex] > items[mostPriorityItemIndex]) {
-    mostPriorityItemIndex = rightChildIndex;
-  }
+    const leftChildExists = leftChildIndex < items.length && leftChildIndex < lastHeapIndex;
+    if (leftChildExists && items[leftChildIndex] > items[mostPriorityItemIndex]) {
+      mostPriorityItemIndex = leftChildIndex;
+    }
 
-  // if parent already has the highest priority, do nothing
-  if (mostPriorityItemIndex != currItemPosition) {
-    swap(items, currItemPosition, mostPriorityItemIndex);
-    heapifyDown({ items, currItemPosition: mostPriorityItemIndex, lastHeapIndex });
+    const rightChildExists = rightChildIndex < items.length && rightChildIndex < lastHeapIndex;
+    if (rightChildExists && items[rightChildIndex] > items[mostPriorityItemIndex]) {
+      mostPriorityItemIndex = rightChildIndex;
+    }
+
+    // stop if heap property is already correct
+    if (mostPriorityItemIndex === current) break;
+
+    swap(items, current, mostPriorityItemIndex);
+    current = mostPriorityItemIndex;
   }
 }
 
 function buildHeapInPlace(arr) {
   const arrSize = arr.length;
   for (let i = Math.floor(arrSize / 2) - 1; i >= 0; i--) {
-    heapifyDown({ items: arr, currItemPosition: i, lastHeapIndex: arrSize }); // at start all array is a heap so lastHeapIndex = arrsize
+    iterativeHeapifyDown({ items: arr, currItemPosition: i, lastHeapIndex: arrSize }); // at start all array is a heap so lastHeapIndex = arrsize
   }
 }
 
@@ -49,7 +54,6 @@ function buildHeapInPlace(arr) {
 function heapsort(items) {
   buildHeapInPlace(items); // 1. build heap in place using same array
 
-  let heapAreaStart = 0;
   let heapAreaEnd = items.length - 1;
 
   // O(n)
@@ -57,7 +61,7 @@ function heapsort(items) {
     swap(items, 0, heapAreaEnd); // step 2 - swap root and last heap item
     --heapAreaEnd; // step 2.1 - decrease heap area
     // O(log n)
-    heapifyDown({ items, currItemPosition: 0, lastHeapIndex: heapAreaEnd }); // step 3 heapify down to fix the new root (put in the right place)
+    iterativeHeapifyDown({ items, currItemPosition: 0, lastHeapIndex: heapAreaEnd }); // step 3 heapify down to fix the new root (put in the right place)
   }
   // return items; // not needed since heapsort is in place
 }
